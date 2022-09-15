@@ -4,7 +4,18 @@ import pytz
 import uuid
 
 
-def main():
+def parse_cal(filename):
+    with open(filename, 'r') as file:
+        cal = Calendar.from_ical(file.read())
+    for component in cal.walk():
+        if component.name == "VEVENT":
+            print(component.get('summary'))
+            print(component.get('dtstart').dt)
+            print(component.get('dtend').dt)
+            print(component.get('dtstamp').dt)
+
+
+def create_cal():
     cal = Calendar()
     cal.add('prodid', '-//Test Calendar//')
     cal.add('version', '2.0')
@@ -27,6 +38,12 @@ def main():
     
     with open('test_cal.ics', 'wb') as file:
         file.write(cal.to_ical())
+
+
+def main():
+    input_cal = 'input_isu_cal.ics'
+    output_cal = 'test_cal.ics'
+    parse_cal(output_cal)
     
 
 if __name__ == '__main__':
