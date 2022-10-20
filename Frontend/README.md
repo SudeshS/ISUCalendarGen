@@ -1,1 +1,0 @@
-This directory has all of the code related to the backend of the webapp.
