@@ -41,9 +41,7 @@ def create_cal():
 
 
 def main():
-    input_cal = 'input_isu_cal.ics'
-    output_cal = 'test_cal.ics'
-    parse_cal(output_cal)
+    create_cal()
     
 
 if __name__ == '__main__':
