@@ -1,3 +1,4 @@
+#Author: Xavier Arriaga
 """
 Calendar Preview aggregates CalendarModel, it provide the means of downloading
 the ics file/calendar/calendar in general, and allows a bit of post editing from
