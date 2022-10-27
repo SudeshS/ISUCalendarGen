@@ -6,6 +6,9 @@ class UserModel:
     def getID():
         pass
 
+    def isGuest():
+        pass
+
     def uploadCalendar():
         pass
 
