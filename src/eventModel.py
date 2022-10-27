@@ -1,5 +1,6 @@
 # author: Kaleb Liang
 
+# eventModel class contains all the data and methods of an event
 class eventModel:
     def __init__(self, eventName, eventTime, eventDescription, calendarID):
         self.eventName = eventName
@@ -7,7 +8,7 @@ class eventModel:
         self.eventDescription = eventDescription
         self.calendarID = calendarID
 
-    def event():
+    def editEvent():
         pass
 
     def getCalendar(id):
