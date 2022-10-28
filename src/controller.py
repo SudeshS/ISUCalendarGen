@@ -1,3 +1,4 @@
+# Class to handle the displaying of certain messages
 class Controller():
 
     def __init__(self, uID):
