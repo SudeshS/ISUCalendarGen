@@ -36,7 +36,7 @@ def create_cal():
     event['uid'] = str(uuid.uuid4())
     cal.add_component(event)
     
-    with open('test_cal.ics', 'wb') as file:
+    with open('data/test_cal.ics', 'wb') as file:
         file.write(cal.to_ical())
 
 

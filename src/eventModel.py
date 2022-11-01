@@ -1,7 +1,7 @@
 # author: Kaleb Liang
 
-# eventModel class contains all the data and methods of an event
-class eventModel:
+# EventModel class contains all the data and methods of an event
+class EventModel:
     def __init__(self, eventName, eventTime, eventDescription, calendarID):
         self.eventName = eventName
         self.eventTime = eventTime
