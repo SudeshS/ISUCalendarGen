@@ -28,6 +28,10 @@ def create_app(test_config=None):
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
+<<<<<<< HEAD
+
+    return app
+=======
     
     from . import db
     db.init_app(app)
@@ -35,3 +39,4 @@ def create_app(test_config=None):
     return app
 
     
+>>>>>>> a683a4ba3a88a61f0bef5e8fa3a2f3b05aa5006d

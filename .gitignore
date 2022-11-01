@@ -1,7 +1,8 @@
 .DS_Store
+venv/
+src/venv/
 *.pyc
 
-venv/
 __pycache__/
 
 instance/
