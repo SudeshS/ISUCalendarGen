@@ -1,10 +1,9 @@
 # authors: Sudesh Sahu, Kaleb Liang
+# file contents copied to eventModel class
 
 from calendar import month
 from icalendar import Calendar, Event
 from datetime import datetime, time
-import pytz
-import uuid
 
 
 class Events:
@@ -45,17 +44,8 @@ def parse_cal(filename):
                 break
     return event_list
 
-    #     f_cal = Calendar.from_ical(file.read())
-    # for component in f_cal.walk():
-    #     if component.name == "VEVENT":
-    #         print(component.get('summary'))
-    #         print(component.get('dtstart').dt)
-    #         print(component.get('dtend').dt)
-    #         print(component.get('dtstamp').dt)
-
 
 def create_cal(event_list):
-    event_list
     cal = Calendar()
     cal.add('prodid', '-//Calendar Event Generator//')
     cal.add('version', '2.0')
@@ -64,24 +54,25 @@ def create_cal(event_list):
         event = Event()
         # temp variable used to store split line
 
+        # uid
         temp = event_list[i].uid.split(":", 1)
         event.add('uid', temp[1])
 
+        # summary
         temp = event_list[i].summary.split(":", 1)
         event.add('summary', temp[1])
 
+        # location
         temp = event_list[i].location.split(":", 1)
         event.add('location', temp[1])
 
-        temp = event_list[i].start.split(":", 1)  # colon used to be semicolon
+        # dtstart
+        temp = event_list[i].start.split(":", 1)
         date = datetime(year=int(temp[1][0:4]), month=int(
             temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]))
         event.add('dtstart', date)
 
-        temp = event_list[i].duration.split(":")
-        time_var = time(hour=int(temp[1][2:3]), minute=int(temp[1][4:6]))
-        event.add('duration', time_var)
-
+        # rrule
         rrule = event_list[i].rule.split(":", 1)
         rrule = rrule[1].split(";")
         freq = rrule[0].split("=")
@@ -100,15 +91,41 @@ def create_cal(event_list):
         }
         event.add('rrule', rrule_dict)
 
+        # dstart
+        temp = event_list[i].start.split(":", 1)
+        ftemp = event_list[i].duration.split(":")
+        hour_var = int(ftemp[1][2:3])   # event hour duration
+        hour_var = hour_var + int(temp[1][9:11])
+
+        dur_minute = int(ftemp[1][4:6])  # event minute duration
+        start_minute = int(temp[1][11:13])  # event start minute
+        dur_minute = dur_minute + start_minute
+
+        # if minutes over 60, add an hour and subtract 60
+        if (dur_minute) > 60:
+            hour_var = hour_var + 1
+            dur_minute = dur_minute - 60
+
+        end_timedate = datetime(year=int(temp[1][0:4]), month=int(
+            temp[1][4:6]), day=int(temp[1][6:8]), hour=hour_var, minute=dur_minute)   # pass to dtend
+        event.add('dtend', end_timedate)
+
+        # duration
+        temp = event_list[i].duration.split(":")
+        time_var = time(hour=int(temp[1][2:3]), minute=int(temp[1][4:6]))
+        event.add('duration', time_var)
+
+        # dtstamp
         temp = event_list[i].dtStamp.split(":", 1)
         date = datetime(year=int(temp[1][0:4]), month=int(
             temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]), second=int(temp[1][13:]))
         event.add('dtstamp', date)
 
+        # description
         event.add('description', event_list[i].desc.split(":", 1))
         cal.add_component(event)
 
-    with open('src/data/test_cal.ics', 'wb') as file:
+    with open('src/data/test_output_cal.ics', 'wb') as file:
         file.write(cal.to_ical())
 
 
