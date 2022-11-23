@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
 
+#### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'cc30d0a491daf6a4ba282e9ea5f9dcfc994cb4b86d66f531'
 
