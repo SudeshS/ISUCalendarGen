@@ -108,13 +108,13 @@ def create_cal(event_list):
         event.add('description', event_list[i].desc.split(":", 1))
         cal.add_component(event)
 
-    with open('src/data/test_cal.ics', 'wb') as file:
+    with open('ISUCalendarGen-1\src\data\input_isu_cal.ics', 'wb') as file:
         file.write(cal.to_ical())
 
 
 def main():
     # CHANGE PATH IF NECESSARY, TESTED ON MAC
-    f_path = 'src/data/input_isu_cal.ics'
+    f_path = 'ISUCalendarGen-1\src\data\input_isu_cal.ics'
     event_list = parse_cal(f_path)
     create_cal(event_list)
 
