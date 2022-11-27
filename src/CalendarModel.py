@@ -100,7 +100,7 @@ class CalendarModel:
         cal.add_component(event)
 
     # updates an event chosen by the user (might need to add an argument for that)
-    def updateEvent(self, newName, newTime, newDesc):
+    def updateEvent(self, cal, newName, newTime, newDesc):
         # call removeEvents then call add events with new events
 
         #newName = input("Enter event Name: ")
@@ -109,18 +109,31 @@ class CalendarModel:
         self.event = EventModel(
             newName, newTime, newDesc, self.getCalendarID())
         self.event.editEvent()
-        pass
+
     # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
 
     # removes the event or events given (may have to limit it to one event per call)
-    def removeEvents(self):
-        # The documentation says nothing about a delete function,
-        # so you'd need to read a calendar file, enumerate its components:
-        # for k,v in cal.items():
-        # and write all the components except the ones to be deleted to a new file.
+    def removeEvents(self, cal, uid):
+        new_cal = Calendar()
 
-        # find event by UID?
-        pass
+        # ---do we want to find calender by UID or name? If UID, how will user know UID
+        # copies cal to new_cal without removed event
+        for k in cal.subcomponents:
+            add_flag = False
+            id_flag = False
+            event = Event()
+
+            for v in k:
+                if id_flag == False:
+                    # if UID matches, all subcomponents are skipped
+                    if k.get(v)[0:9] == '2232-3620':
+                        add_flag = True
+                        break
+                id_flag = True
+                event.add(v, k.get(v))
+
+            if add_flag == False:
+                new_cal.add_component(event)
 
     # generates the ICSFile to be exported/downloaded (may need to return or print a string)
     def generateICSFile(event_list):
