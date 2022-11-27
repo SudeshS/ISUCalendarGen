@@ -15,7 +15,7 @@ class EventModel:
         self.dtStamp = dtStamp
         self.desc = desc
 
-    # parses calendar --- should this go here?
+    # parses calendar ---- should this go here?
     def parse_cal(filename):
         event_list = []
         with open(filename, 'r') as file:
@@ -42,7 +42,6 @@ class EventModel:
                     if counter > 3:
                         break
 
-                
         return event_list
 
     # edit calendar events --- what about calendarModel methods?
