@@ -91,7 +91,7 @@ def create_cal(event_list):
         }
         event.add('rrule', rrule_dict)
 
-        # dstart
+        # dtend
         temp = event_list[i].start.split(":", 1)
         ftemp = event_list[i].duration.split(":")
         hour_var = int(ftemp[1][2:3])   # event hour duration
@@ -130,8 +130,8 @@ def create_cal(event_list):
 
 
 def main():
-    # CHANGE PATH IF NECESSARY, TESTED ON MAC
-    f_path = 'src/data/input_isu_cal.ics'
+    # CHANGE PATH FOR FINAL VERSION
+    f_path = 'data/input_isu_cal_i.ics'
     event_list = parse_cal(f_path)
     create_cal(event_list)
 
