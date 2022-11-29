@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Add a New Event {% endblock %}</h1>
+    <form method="post">
+        <!-- This entry is for SUMMARY variable -->
+        <label for="Summary">Class Name (Summary):</label>
+        <br>
+        <input type="text" name="Summary"
+               placeholder="Type Here"
+               value="{{ request.form['Summary'] }}"></input>
+        <br>
+        <br>
+
+        <!-- This entry is for DTSTART variable -->
+        <!-- YYYY=year, MM=month, DD=day, T is needed? -->
+        <!-- HH=hour(military), mm=minutes SS=seconds  -->
+        <label for="DTSTART">Start Time (DTSTART):</label>
+        <br>
+        <p> YYYY=year, MM=month, DD=day, T is required there, HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
+        <p>YYYYMMDDTHHmmSS</p>
+        <textarea name="DTSTART"
+                  placeholder="YYYYMMDDTHHMMSS"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['DTSTART'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- This entry is for DTEND variable -->
+        <!-- YYYY=year, MM=month, DD=day, T is needed? -->
+        <!-- HH=hour(military), mm=minutes SS=seconds  -->
+        <label for="DTEND">End Time (DTEND):</label>
+        <br>
+        <p> YYYY=year, MM=month, DD=day, T is required there, HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
+        <p>YYYYMMDDTHHmmSS</p>
+        <textarea name="DTEND"
+                  placeholder="YYYYMMDDTHHmmSS"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['DTEND'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- This entry is for DURATION variable -->
+        <!-- HH=hour(military), mm=minutes SS=seconds  -->
+        <label for="Duration">Duration:</label>
+        <br>
+        <p> HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
+        <p>HHmmSS</p>
+        <textarea name="Duration"
+                  placeholder="HHmmSS"
+                  rows="1"
+                  cols="12"
+                  >{{ request.form['Duration'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- Not sure what teh DTSTAMP value is or if it's needed-->
+
+        <!-- RRULE can just stay a fixed value if needed, like weekly will stay the same most likely keep this UNTIL all caps to see if it affects anything-->
+        <label for="UNTIL">End Date (UNTIL):</label>
+        <br>
+        <p> YYYY=year, MM=month, DD=day, T is required there, HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
+        <p>YYYYMMDDTHHMMSS</p>
+        <textarea name="UNTIL"
+                  placeholder="YYYYMMDDTHHmmSS"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['UNTIL'] }}</textarea>
+        <br>
+        <br>
+
+        <label for="BYDAY">Class Days (BYDAY):</label>
+        <br>
+        <textarea name="BYDAY"
+                  placeholder="MO,TU,WE,TH,FR"
+                  rows="1"
+                  cols="16"
+                  >{{ request.form['BYDAY'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- This entry is for DESCRIPTION variable -->
+        <label for="Description">Description:</label>
+        <br>
+        <textarea name="Description"
+                  placeholder="Class Description"
+                  rows="20"
+                  cols="60"
+                  >{{ request.form['Description'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- This entry is for LOCATION variable -->
+        <label for="Location">Location:</label>
+        <br>
+        <textarea name="Location"
+                  placeholder="Example Location"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['Location'] }}</textarea>
+        <br>
+        <br>
+        
+
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

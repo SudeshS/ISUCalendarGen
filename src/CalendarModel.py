@@ -5,6 +5,12 @@ It is the main class for creating, updating, and removing events.
 It also deals with generating the ICSFile and generating a preview
 """
 
+from CalendarPreview import CalendarPreview
+from eventModel import EventModel
+from calendar import month
+from icalendar import Calendar, Event
+from datetime import datetime, time
+
 
 from CalendarPreview import CalendarPreview
 from eventModel import EventModel
@@ -201,27 +207,33 @@ class CalendarModel:
                 temp[1][4:6]), day=int(temp[1][6:8]), hour=hour_var, minute=dur_minute)   # pass to dtend
             event.add('dtend', end_timedate)
 
-            # duration
-            temp = event_list[i].duration.split(":")
-            time_var = time(hour=int(temp[1][2:3]), minute=int(temp[1][4:6]))
-            event.add('duration', time_var)
+    def checkCalendarFormat(): #checks if the calendar is formated correctly
+        #will read in a file to ensure that the calendar that will be
+        #generated is correctly formated.
+        return bool
 
-            # dtstamp
-            temp = event_list[i].dtStamp.split(":", 1)
-            date = datetime(year=int(temp[1][0:4]), month=int(
-                temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]), second=int(temp[1][13:]))
-            event.add('dtstamp', date)
+    def addEvents(self, eName, eTime, eDesc): #will add an event and return nothing
+        #eName = input("Enter event Name: ")
+        #eTime = input("Enter time slot (like xx:xx to xx:xx): ")
+        #eDesc = input("Enter a short description on your event: ")
+        self.event = eventModel(eName, eTime, eDesc, self.getCalendarID())
+        pass
 
-            # description
-            event.add('description', event_list[i].desc.split(":", 1))
-            cal.add_component(event)
+    def updateEvent(self, newName, newTime, newDesc): #updates an event chosen by the user (might need to add an argument for that) 
+        #newName = input("Enter event Name: ")
+        #newTime = input("Enter time slot (like xx:xx to xx:xx): ")
+        #newDesc = input("Enter a short description on your event: ")
+        self.event = eventModel(newName, newTime, newDesc, self.getCalendarID())
+        self.event.editEvent()
+        pass
+    #although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
 
-        # do we write a file here or save file?
-        # with open('ISUCalendarGen-1\src\data\input_isu_cal.ics', 'wb') as file:
-        #     file.write(cal.to_ical())
+    def removeEvents(self, event): #removes the event or events given (may have to limit it to one event per call)
+        pass
 
-        # CalendarModel.setCalendarID()
-        return cal
+    def generateICSFile(): #generates the ICSFile to be exported/downloaded (may need to return or print a string)
+        #should call the ics_generator.py file?
+        pass
 
     # gives a preview of what the calendar will look like (will need to generate calendar preview)
     def generatePreview(self, user):
