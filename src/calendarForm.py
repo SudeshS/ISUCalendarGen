@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
+from iCalendar import Calendar, Event
 
 #### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
@@ -26,6 +27,7 @@ def create():
         BYDAY = request.form['BYDAY']
         Description = request.form['Description']
         Location = request.form['Location']
+        # DTStamp will be down on backend, will be time the event is created
 
         if not summary:
             flash('Class Name is required!')
@@ -33,6 +35,12 @@ def create():
             flash('Start Time is required!')
         elif not DTEnd:
             flash('End Time is required')
+        elif not Duration:
+            flash('Duration is required')
+        elif not UNTIL:
+            flash('UNTIL is required')
+        elif not BYDAY:
+            flash('BYDAY is required')
         else:
             messages.append({'Summary': summary, 'DTSTART': DTStart, 'DTEND': DTEnd, 'Duration': Duration, 'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
