@@ -67,6 +67,9 @@ class CalendarModel:
     def addEvents(self, cal):
         event = Event()
 
+        #
+        #
+        # ----- replace inputs with frontend variables from calendarForm -----
         duration = input("Duration of class (ex. 1H15M): ")
         duration = time(hour=int(duration[0], minute=int(duration[2:3])))
         event.add('duration', duration)
@@ -130,6 +133,9 @@ class CalendarModel:
         event.add('dtend', end)
 
         cal.add_component(event)
+        # ----- replace inputs with frontend variables from calendarForm -----
+        #
+        #
 
     # updates an event chosen by the user (might need to add an argument for that)
     def updateEvent(self, cal, newName, newTime, newDesc):
@@ -145,25 +151,29 @@ class CalendarModel:
     # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
 
     # removes the event or events given (may have to limit it to one event per call)
-    def removeEvents(self, cal, uid):
+    def removeEvents(self, cal):
         new_cal = Calendar()
 
-        # ---do we want to find calender by UID or name? If UID, how will user know UID
         # copies cal to new_cal without removed event
         for k in cal.subcomponents:
             add_flag = False
-            id_flag = False
+            summary_check = 'Gender In The Humanities'  # parameter
             event = Event()
+            counter = 0
 
             for v in k:
-                if id_flag == False:
-                    # if name matches, skip back to begin: vevent and delete until end:vevent
-                    if k.get(v)[0:9] == '2232-3620':
+                print(v, k.get(v))
+                if counter < 2:  # will not enter if statement if no issues after 2nd iteration
+                    var = k.get(v)
+                    var = var.replace('\n', '')
+                    # if name matches, set add_flag to true and break loop
+                    if var == summary_check:
                         add_flag = True
                         break
-                id_flag = True
+                counter += 1
                 event.add(v, k.get(v))
 
+            # add_flag determines if event is added
             if add_flag == False:
                 new_cal.add_component(event)
 
@@ -203,8 +213,13 @@ class CalendarModel:
 
             days = []
             byday = byday[1].split(',')  # num of days are dynamic
-            for x in range(len(byday[1])):
-                days.append(byday[x])
+            # if only one class
+            if (len(byday) == 1):
+                days.append(byday[0])
+            # else more than one class
+            else:
+                for x in range(len(byday)):
+                    days.append(byday[x])
             until = rrule[2].split("=")
 
             rrule_dict = {
