@@ -1,5 +1,8 @@
+#Author: Xavier Arriaga
 from flask import Flask, render_template, request, url_for, flash, redirect
-from iCalendar import Calendar, Event
+##from iCalendar import Calendar, Event
+#from wtforms import Form, BooleanField, StringField, PasswordField, validators
+# ^ for validation if we have time for it, but this requires pip install Flask Flask-WTF
 
 #### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
@@ -13,14 +16,16 @@ messages = [
 
 @app.route('/')
 def index():
-    return render_template('index.html', messages=messages)
+    return render_template('index.html', messages=messages) 
+    #these files are key to this working
 
 #Create handles the GET-ing of information from the form
 @app.route('/create/', methods=('GET', 'POST'))
 def create():
     if request.method == 'POST':
         summary = request.form['Summary']
-        DTStart = request.form['DTSTART']
+        DTStart = request.form['DTSTART'] #start date
+        StartTime = request.form['StartTime'] #start time
         DTEnd = request.form['DTEND']
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
@@ -32,7 +37,9 @@ def create():
         if not summary:
             flash('Class Name is required!')
         elif not DTStart:
-            flash('Start Time is required!')
+            flash('Start Date is required!')
+        elif not StartTime:
+            flash('Start Time is required')
         elif not DTEnd:
             flash('End Time is required')
         elif not Duration:
