@@ -7,9 +7,9 @@ This should be created when generatePreview is called in the CalendarModel class
 """
 
 class CalendarPreview:
-    def __init__(cal, calendarID, user):
-        cal.calendarID = calendarID
-        cal.user = user
+    def __init__(self, calendarID, user):
+        self.calendarID = calendarID
+        self.user = user
 
     #Display's the calendar in a somewhat readable way as a preview 
     def display(): 
@@ -32,16 +32,16 @@ class CalendarPreview:
         pass
 
     #Getters
-    def getCalendarID(cal):
-        return cal.calendarID
+    def getCalendarID(self):
+        return self.calendarID
 
-    def getUser(cal):
-        return cal.user
+    def getUser(self):
+        return self.user
 
     #Setters
-    def setCalendarID(cal, calID):
-        cal.calendarID = calID
+    def setCalendarID(self, calID):
+        self.calendarID = calID
         pass
 
-    def setUser(cal, calUser):
-        cal.User = calUser
+    def setUser(self, calUser):
+        self.User = calUser
