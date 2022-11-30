@@ -14,9 +14,43 @@ from datetime import datetime, time
 
 
 class CalendarModel:
-    def __init__(self, calendarID, calendarName):  # Declaring the class
+    def __init__(self, calendarID, uid, summary, location, start, duration, rule, dtStamp, desc):  # Declaring the class
         self.calendarID = calendarID
-        self.calendarName = calendarName
+        self.uid = uid
+        self.summary = summary
+        self.location = location
+        self.start = start
+        self.duration = duration
+        self.rule = rule
+        self.dtStamp = dtStamp
+        self.desc = desc
+
+    # parses calendar ---- prob goes in calendarModel
+    def parse_cal(filename):
+        event_list = []
+        with open(filename, 'r') as file:
+            counter = 0
+            # assume all imported ics files are of similar structure, only # of events change
+            while True:
+                line = file.readline()
+
+                if line == "BEGIN:VEVENT\n":
+                    uid = file.readline()
+                    summary = file.readline()
+                    location = file.readline()
+                    start = file.readline()
+                    duration = file.readline()
+                    rule = file.readline()
+                    dtStamp = file.readline()
+                    desc = file.readline()
+
+                    event_list.append(
+                        CalendarModel(0, uid, summary, location, start, duration, rule, dtStamp, desc))
+
+                if line == "":
+                    counter = counter + 1
+                    if counter > 3:
+                        break
 
     # checks if the calendar is formated correctly
     def checkCalendarFormat(event_list):
@@ -33,10 +67,6 @@ class CalendarModel:
     def addEvents(self, cal):
         event = Event()
 
-        # --- how does user know the UID? (Unique identifier within calendar)
-        uid = input("UID: ")
-        event.add('uid', uid)
-
         duration = input("Duration of class (ex. 1H15M): ")
         duration = time(hour=int(duration[0], minute=int(duration[2:3])))
         event.add('duration', duration)
@@ -44,7 +74,6 @@ class CalendarModel:
         desc = input("Description: ")
         event.add('description', desc)
 
-        # ---do we need desc and summary?
         summary = input("Summary: ")
         event.add('summary', summary)
 
@@ -57,6 +86,7 @@ class CalendarModel:
         start_time = input(
             "Start Time (ex. 03:15PM, must include AM or PM): ")
 
+        # AM/PM conversions
         try:
             # PM
             if start_time[5] == 'P':
@@ -81,21 +111,23 @@ class CalendarModel:
 
         event.add('dtstart', start)
 
-        freq = input("Frequency (Daily/Weekly/Yearly): ")
         byday = input(
             "By day - MO/TU/WE/TH/FR\nex1. MO,WE,FR  |   ex2. TU,TH: ")
         until = input("Last day of event (ex. 12/16/2022): ")
         # freq/byDay/until, convert until with datetime
         rrule = {
-            'freq': freq,
+            'freq': 'WEEKLY',
             'byday': byday,
             'until': datetime(year=int(until[6:10]), month=int(until[0:2]), day=int(until[3:5]))
         }
         event.add('rrule', rrule)
 
-        # dtstamp: when ics file was created --- do we need this?
-        dtStamp = input("Stamp?")
-        event.add('uid', uid)
+        # dtStamp: when ics file was created set current time when method is called
+        # dtStamp
+
+        end = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(
+            start_date[3:5]), hour=int(duration[0], minute=int(duration[2:3])))
+        event.add('dtend', end)
 
         cal.add_component(event)
 
@@ -125,7 +157,7 @@ class CalendarModel:
 
             for v in k:
                 if id_flag == False:
-                    # if UID matches, all subcomponents are skipped
+                    # if name matches, skip back to begin: vevent and delete until end:vevent
                     if k.get(v)[0:9] == '2232-3620':
                         add_flag = True
                         break
@@ -216,11 +248,12 @@ class CalendarModel:
             event.add('description', event_list[i].desc.split(":", 1))
             cal.add_component(event)
 
+            # CalendarModel.setCalendarID =
+
         # do we write a file here or save file?
         # with open('ISUCalendarGen-1\src\data\input_isu_cal.ics', 'wb') as file:
         #     file.write(cal.to_ical())
 
-        # CalendarModel.setCalendarID()
         return cal
 
     # gives a preview of what the calendar will look like (will need to generate calendar preview)
