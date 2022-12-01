@@ -52,6 +52,8 @@ class CalendarModel:
                     if counter > 3:
                         break
 
+        return event_list
+
     # checks if the calendar is formated correctly
     def checkCalendarFormat(event_list):
         # if calendar generation is successful, returns true
