@@ -14,9 +14,43 @@ from datetime import datetime, time
 
 
 class CalendarModel:
-    def __init__(self, calendarID, calendarName):  # Declaring the class
+    def __init__(self, calendarID, uid, summary, location, start, duration, rule, dtStamp, desc):  # Declaring the class
         self.calendarID = calendarID
-        self.calendarName = calendarName
+        self.uid = uid
+        self.summary = summary
+        self.location = location
+        self.start = start
+        self.duration = duration
+        self.rule = rule
+        self.dtStamp = dtStamp
+        self.desc = desc
+
+    # parses calendar
+    def parse_cal(filename):
+        event_list = []
+        with open(filename, 'r') as file:
+            counter = 0
+            # assume all imported ics files are of similar structure, only # of events change
+            while True:
+                line = file.readline()
+
+                if line == "BEGIN:VEVENT\n":
+                    uid = file.readline()
+                    summary = file.readline()
+                    location = file.readline()
+                    start = file.readline()
+                    duration = file.readline()
+                    rule = file.readline()
+                    dtStamp = file.readline()
+                    desc = file.readline()
+
+                    event_list.append(
+                        CalendarModel(0, uid, summary, location, start, duration, rule, dtStamp, desc))
+
+                if line == "":
+                    counter = counter + 1
+                    if counter > 3:
+                        break
 
     # checks if the calendar is formated correctly
     def checkCalendarFormat(event_list):
@@ -33,10 +67,9 @@ class CalendarModel:
     def addEvents(self, cal):
         event = Event()
 
-        # --- how does user know the UID? (Unique identifier within calendar)
-        uid = input("UID: ")
-        event.add('uid', uid)
-
+        #
+        #
+        # ----- replace inputs with frontend variables from calendarForm -----
         duration = input("Duration of class (ex. 1H15M): ")
         duration = time(hour=int(duration[0], minute=int(duration[2:3])))
         event.add('duration', duration)
@@ -44,7 +77,6 @@ class CalendarModel:
         desc = input("Description: ")
         event.add('description', desc)
 
-        # ---do we need desc and summary?
         summary = input("Summary: ")
         event.add('summary', summary)
 
@@ -57,6 +89,7 @@ class CalendarModel:
         start_time = input(
             "Start Time (ex. 03:15PM, must include AM or PM): ")
 
+        # AM/PM conversions
         try:
             # PM
             if start_time[5] == 'P':
@@ -81,59 +114,66 @@ class CalendarModel:
 
         event.add('dtstart', start)
 
-        freq = input("Frequency (Daily/Weekly/Yearly): ")
         byday = input(
             "By day - MO/TU/WE/TH/FR\nex1. MO,WE,FR  |   ex2. TU,TH: ")
         until = input("Last day of event (ex. 12/16/2022): ")
         # freq/byDay/until, convert until with datetime
         rrule = {
-            'freq': freq,
+            'freq': 'WEEKLY',
             'byday': byday,
             'until': datetime(year=int(until[6:10]), month=int(until[0:2]), day=int(until[3:5]))
         }
         event.add('rrule', rrule)
 
-        # dtstamp: when ics file was created --- do we need this?
-        dtStamp = input("Stamp?")
-        event.add('uid', uid)
+        # dtStamp: when ics file was created set current time when method is called
+        # dtStamp
+
+        end = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(
+            start_date[3:5]), hour=int(duration[0], minute=int(duration[2:3])))
+        event.add('dtend', end)
 
         cal.add_component(event)
+        # ----- replace inputs with frontend variables from calendarForm -----
+        #
+        #
 
     # updates an event chosen by the user (might need to add an argument for that)
-    def updateEvent(self, cal, newName, newTime, newDesc):
+    def updateEvent(self, cal, event_name):
         # call removeEvents then call add events with new events
+        new_cal = CalendarModel.removeEvents(cal, event_name)
+        CalendarModel.addEvents(new_cal)
 
-        #newName = input("Enter event Name: ")
-        #newTime = input("Enter time slot (like xx:xx to xx:xx): ")
-        #newDesc = input("Enter a short description on your event: ")
-        self.event = EventModel(
-            newName, newTime, newDesc, self.getCalendarID())
-        self.event.editEvent()
+        # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
 
-    # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
-
-    # removes the event or events given (may have to limit it to one event per call)
-    def removeEvents(self, cal, uid):
+        # removes the event or events given (may have to limit it to one event per call)
+    def removeEvents(self, cal, event_name):
         new_cal = Calendar()
 
-        # ---do we want to find calender by UID or name? If UID, how will user know UID
         # copies cal to new_cal without removed event
         for k in cal.subcomponents:
             add_flag = False
-            id_flag = False
+            # event_name = 'Gender In The Humanities'
+            # parameter for the event name to be removed
             event = Event()
+            counter = 0
 
             for v in k:
-                if id_flag == False:
-                    # if UID matches, all subcomponents are skipped
-                    if k.get(v)[0:9] == '2232-3620':
+                print(v, k.get(v))
+                if counter < 2:  # will not enter if statement if no issues after 2nd iteration
+                    var = k.get(v)
+                    var = var.replace('\n', '')
+                    # if name matches, set add_flag to true and break loop
+                    if var == event_name:
                         add_flag = True
                         break
-                id_flag = True
+                counter += 1
                 event.add(v, k.get(v))
 
+            # add_flag determines if event is added
             if add_flag == False:
                 new_cal.add_component(event)
+
+        return new_cal
 
     # generates the ICSFile to be exported/downloaded (may need to return or print a string)
     def generateICSFile(event_list):
@@ -171,8 +211,13 @@ class CalendarModel:
 
             days = []
             byday = byday[1].split(',')  # num of days are dynamic
-            for x in range(len(byday[1])):
-                days.append(byday[x])
+            # if only one class
+            if (len(byday) == 1):
+                days.append(byday[0])
+            # else more than one class
+            else:
+                for x in range(len(byday)):
+                    days.append(byday[x])
             until = rrule[2].split("=")
 
             rrule_dict = {
@@ -216,11 +261,12 @@ class CalendarModel:
             event.add('description', event_list[i].desc.split(":", 1))
             cal.add_component(event)
 
+            # CalendarModel.setCalendarID =
+
         # do we write a file here or save file?
         # with open('ISUCalendarGen-1\src\data\input_isu_cal.ics', 'wb') as file:
         #     file.write(cal.to_ical())
 
-        # CalendarModel.setCalendarID()
         return cal
 
     # gives a preview of what the calendar will look like (will need to generate calendar preview)

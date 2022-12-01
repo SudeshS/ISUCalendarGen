@@ -17,6 +17,7 @@ class Events:
         self.rule = rule
         self.dtStamp = dtStamp
         self.desc = desc
+# test test
 
 
 def parse_cal(filename):
@@ -55,15 +56,20 @@ def parse_cal(filename):
 
 
 def create_cal(event_list):
-    event_list
+    # ---used for testing---
+    # cal1 = Calendar()
+    # cal1.add('prodid', '-//Calendar Event Generator//')
+    # cal1.add('version', '2.0')
+
     cal = Calendar()
     cal.add('prodid', '-//Calendar Event Generator//')
     cal.add('version', '2.0')
 
     for i in range(len(event_list)):
         event = Event()
-        # temp variable used to store split line
 
+        # temp variable used to store split line
+        # uid
         temp = event_list[i].uid.split(":", 1)
         event.add('uid', temp[1])
 
@@ -89,8 +95,13 @@ def create_cal(event_list):
 
         days = []
         byday = byday[1].split(',')  # num of days are dynamic
-        for x in range(len(byday[1])):
-            days.append(byday[x])
+        # if only one class
+        if (len(byday) == 1):
+            days.append(byday[0])
+        # else more than one class
+        else:
+            for x in range(len(byday)):
+                days.append(byday[x])
         until = rrule[2].split("=")
 
         rrule_dict = {
@@ -108,15 +119,22 @@ def create_cal(event_list):
         event.add('description', event_list[i].desc.split(":", 1))
         cal.add_component(event)
 
-    with open('ISUCalendarGen-1\src\data\input_isu_cal.ics', 'wb') as file:
-        file.write(cal.to_ical())
+    # with open('data/output_isu_cal.ics', 'wb') as file:
+    #     file.write(cal1.to_ical())
 
 
 def main():
-    # CHANGE PATH IF NECESSARY, TESTED ON MAC
-    f_path = 'ISUCalendarGen-1\src\data\input_isu_cal.ics'
-    event_list = parse_cal(f_path)
-    create_cal(event_list)
+
+
+<< << << << < Temporary merge branch 1
+# CHANGE PATH FOR FINAL VERSION
+f_path = 'data/input_isu_cal_i.ics'
+== == == == =
+# CHANGE PATH IF NECESSARY, TESTED ON MAC
+f_path = 'ISUCalendarGen-1\src\data\input_isu_cal.ics'
+>>>>>>>> > Temporary merge branch 2
+event_list = parse_cal(f_path)
+create_cal(event_list)
 
 
 if __name__ == '__main__':
