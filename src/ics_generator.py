@@ -45,14 +45,6 @@ def parse_cal(filename):
                 break
     return event_list
 
-    #     f_cal = Calendar.from_ical(file.read())
-    # for component in f_cal.walk():
-    #     if component.name == "VEVENT":
-    #         print(component.get('summary'))
-    #         print(component.get('dtstart').dt)
-    #         print(component.get('dtend').dt)
-    #         print(component.get('dtstamp').dt)
-
 
 def create_cal(event_list):
     # ---used for testing---
