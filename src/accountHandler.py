@@ -19,8 +19,10 @@ class AccountHandler:
         pass
 
     def logout():
-        #
+        # 
         pass
 
     def deleteAccount():
+        # self.username = input("Username: ")
+        # self.password = input("Password: ")
         pass
