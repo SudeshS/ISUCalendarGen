@@ -1,6 +1,7 @@
 # Class to login, logout, delete, and create system accounts
 class AccountHandler:
 
+    # ---- only isLoggedIn is a parameter in class diagram 
     def __init__(self, uID):
         self.username = ""
         self.password = ""

@@ -1,21 +1,24 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
-from iCalendar import Calendar, Event
+from icalendar import Calendar, Event
 
 #### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'cc30d0a491daf6a4ba282e9ea5f9dcfc994cb4b86d66f531'
 
-#Messages is just a name, I was gonna switch it to classes
+# Messages is just a name, I was gonna switch it to classes
 # but I couldn't get it to work for the time being, so keep it for now
 # unless you know how to fix it
 messages = [
-            ]
+]
+
 
 @app.route('/')
 def index():
     return render_template('index.html', messages=messages)
 
-#Create handles the GET-ing of information from the form
+# Create handles the GET-ing of information from the form
+
+
 @app.route('/create/', methods=('GET', 'POST'))
 def create():
     if request.method == 'POST':
@@ -42,9 +45,10 @@ def create():
         elif not BYDAY:
             flash('BYDAY is required')
         else:
-            messages.append({'Summary': summary, 'DTSTART': DTStart, 'DTEND': DTEnd, 'Duration': Duration, 'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
+            messages.append({'Summary': summary, 'DTSTART': DTStart, 'DTEND': DTEnd, 'Duration': Duration,
+                            'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
 
     return render_template('create.html')
 
-#Location should be kept not required alongside some others likely (description?)
+# Location should be kept not required alongside some others likely (description?)

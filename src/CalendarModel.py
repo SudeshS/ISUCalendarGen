@@ -25,7 +25,7 @@ class CalendarModel:
         self.dtStamp = dtStamp
         self.desc = desc
 
-    # parses calendar ---- prob goes in calendarModel
+    # parses calendar
     def parse_cal(filename):
         event_list = []
         with open(filename, 'r') as file:
@@ -138,26 +138,22 @@ class CalendarModel:
         #
 
     # updates an event chosen by the user (might need to add an argument for that)
-    def updateEvent(self, cal, newName, newTime, newDesc):
+    def updateEvent(self, cal, event_name):
         # call removeEvents then call add events with new events
+        new_cal = CalendarModel.removeEvents(cal, event_name)
+        CalendarModel.addEvents(new_cal)
 
-        #newName = input("Enter event Name: ")
-        #newTime = input("Enter time slot (like xx:xx to xx:xx): ")
-        #newDesc = input("Enter a short description on your event: ")
-        self.event = EventModel(
-            newName, newTime, newDesc, self.getCalendarID())
-        self.event.editEvent()
+        # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
 
-    # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
-
-    # removes the event or events given (may have to limit it to one event per call)
-    def removeEvents(self, cal):
+        # removes the event or events given (may have to limit it to one event per call)
+    def removeEvents(self, cal, event_name):
         new_cal = Calendar()
 
         # copies cal to new_cal without removed event
         for k in cal.subcomponents:
             add_flag = False
-            summary_check = 'Gender In The Humanities'  # parameter
+            # event_name = 'Gender In The Humanities'
+            # parameter for the event name to be removed
             event = Event()
             counter = 0
 
@@ -167,7 +163,7 @@ class CalendarModel:
                     var = k.get(v)
                     var = var.replace('\n', '')
                     # if name matches, set add_flag to true and break loop
-                    if var == summary_check:
+                    if var == event_name:
                         add_flag = True
                         break
                 counter += 1
@@ -176,6 +172,8 @@ class CalendarModel:
             # add_flag determines if event is added
             if add_flag == False:
                 new_cal.add_component(event)
+
+        return new_cal
 
     # generates the ICSFile to be exported/downloaded (may need to return or print a string)
     def generateICSFile(event_list):
