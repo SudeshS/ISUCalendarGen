@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %} - FlaskApp</title>
+    <title>{% block title %} {% endblock %} -Class Preview</title>
     <style>
         .message {
             padding: 10px;
@@ -27,9 +27,11 @@
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('index') }}">FlaskApp</a>
+        <a href="{{ url_for('index') }}">Class Preview</a>
         <a href="{{ url_for('create') }}">Create</a>
+        <a href="{{ url_for('upload') }}">Upload</a>
         <!-- <a href="#">About</a> -->
+        
     </nav>
     <hr>
     <div class="content">
