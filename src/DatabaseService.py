@@ -18,6 +18,6 @@ class DatabaseService():
         pass
 
 
-    def getCalendar(self): #needs a check to see if the calendar is indeed there and if not send a null calendar?
+    def getCalendar(self, calendar): #needs a check to see if the calendar is indeed there and if not send a null calendar?
         #also needs to return the calendar, so we'll likely need another attribute for a calendar object
         pass

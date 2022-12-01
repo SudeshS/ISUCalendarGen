@@ -30,7 +30,7 @@ class UserModel:
             calModel = CalendarModel(self.calendar, cName)
             calModel.generateICSFile()
         else:
-            cal = dbs.getCalendar()
+            cal = dbs.getCalendar(self.calendar)
         #ask the user what they would like to call the calendar (front end?)
         
     #not sure how to get the user the ability to view all    

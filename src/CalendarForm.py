@@ -29,7 +29,6 @@ def create():
         summary = request.form['Summary']
         DTStart = request.form['DTSTART']  # start date
         StartTime = request.form['StartTime']  # start time
-        DTEnd = request.form['DTEND']
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
         BYDAY = request.form['BYDAY']
@@ -43,8 +42,6 @@ def create():
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
-        elif not DTEnd:
-            flash('End Time is required')
         elif not Duration:
             flash('Duration is required')
         elif not UNTIL:
@@ -52,7 +49,7 @@ def create():
         elif not BYDAY:
             flash('BYDAY is required')
         else:
-            messages.append({'Summary': summary, 'DTSTART': DTStart, 'DTEND': DTEnd, 'Duration': Duration,
+            messages.append({'Summary': summary, 'DTSTART': DTStart, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
 
