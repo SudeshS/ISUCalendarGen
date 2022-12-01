@@ -17,7 +17,6 @@ class Events:
         self.rule = rule
         self.dtStamp = dtStamp
         self.desc = desc
-# test test
 
 
 def parse_cal(filename):
@@ -124,17 +123,10 @@ def create_cal(event_list):
 
 
 def main():
-
-
-<< << << << < Temporary merge branch 1
-# CHANGE PATH FOR FINAL VERSION
-f_path = 'data/input_isu_cal_i.ics'
-== == == == =
-# CHANGE PATH IF NECESSARY, TESTED ON MAC
-f_path = 'ISUCalendarGen-1\src\data\input_isu_cal.ics'
->>>>>>>> > Temporary merge branch 2
-event_list = parse_cal(f_path)
-create_cal(event_list)
+    # CHANGE PATH FOR FINAL VERSION
+    f_path = 'data/input_isu_cal_i.ics'
+    event_list = parse_cal(f_path)
+    create_cal(event_list)
 
 
 if __name__ == '__main__':
