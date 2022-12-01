@@ -2,14 +2,7 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
 from os.path import join, dirname, realpath
-import os
-
-##from iCalendar import Calendar, Event
-#from wtforms import Form, BooleanField, StringField, PasswordField, validators
-# ^ for validation if we have time for it, but this requires pip install Flask Flask-WTF
-
-# This is the url that our server runs on
-# host_URL =
+from flask_sqlalchemy import SQLAlchemy
 
 #### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
@@ -21,8 +14,10 @@ app.config['SECRET_KEY'] = 'cc30d0a491daf6a4ba282e9ea5f9dcfc994cb4b86d66f531'
 messages = [
 ]
 
-# debug mode toggle comment
-app.config["DEBUG"] = True
+# enable debugging mode
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:isu@localhost/CalendarDatabase'
+
+db = SQLAlchemy(app)
 
 # Upload folder
 # this is where things will be stored locally until they can
@@ -30,11 +25,19 @@ app.config["DEBUG"] = True
 UPLOAD_FOLDER = app.static_folder
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
 
-# Upload page rendering
+
+class CForm(db.Model):
+    __tablename__ = 'calendars'
+    id = db.Column(db.Integer, primary_key=True)
+    file = db.Column(db.Text)
+
+    def __init__(self, file):
+        self.file = file
+# Root URL - What the user connects to
 
 
-@app.route('/upload/')
-def upload():
+@app.route('/')
+def index():
     # Set the upload HTML template '\templates\index.html'
     return render_template('upload.html')
 
@@ -46,10 +49,13 @@ def uploadFiles():
     # get the uploaded file
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
-        file_path = os.path.join(
-            app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+        file = uploaded_file
+        cform = CForm(file)
+        db.session.add(cform)
+        db.session.commit()
+        #file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
         # set the file path
-        uploaded_file.save(file_path)
+        # uploaded_file.save(file_path)
         # save the file
     return redirect(url_for('upload'))
 
@@ -94,9 +100,9 @@ def create():
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
 
-    return render_template('create.html')
 
+with app.app_context():
+    db.create_all()
 
-# Location should be kept not required alongside some others likely (description?)
 if (__name__ == '__main__'):
     app.run(port=5000)

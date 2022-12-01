@@ -16,6 +16,7 @@ six = "==1.16.0"
 werkzeug = "==1.0.1"
 psycopg2 = "*"
 flask-sqlalchemy = "*"
+flask-login = "*"
 
 [dev-packages]
 
