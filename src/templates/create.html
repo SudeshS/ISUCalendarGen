@@ -15,25 +15,38 @@
         <!-- This entry is for DTSTART variable -->
         <!-- YYYY=year, MM=month, DD=day, T is needed? -->
         <!-- HH=hour(military), mm=minutes SS=seconds  -->
-        <label for="DTSTART">Start Time (DTSTART):</label>
+        <label for="DTSTART">Start Date (DTSTART pt1):</label>
         <br>
-        <p> YYYY=year, MM=month, DD=day, T is required there, HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
-        <p>YYYYMMDDTHHmmSS</p>
+        <p> month/day/year</p>
+        <p> ex. 01/17/2022</p>
         <textarea name="DTSTART"
-                  placeholder="YYYYMMDDTHHMMSS"
+                  placeholder="MM/DD/YYYY"
                   rows="1"
                   cols="20"
                   >{{ request.form['DTSTART'] }}</textarea>
         <br>
         <br>
 
+        <label for="StartTime">Start Time (DTSTART pt2):</label>
+        <br>
+        <p> Non-military time that the class starts at</p>
+        <p> ex. 03:15PM, must include AM or PM</p>
+        <textarea name="StartTime"
+                  placeholder="##:##PM or ##:##AM"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['StartTime'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- NEED TO ADJUST FORMAT-->
         <!-- This entry is for DTEND variable -->
         <!-- YYYY=year, MM=month, DD=day, T is needed? -->
         <!-- HH=hour(military), mm=minutes SS=seconds  -->
         <label for="DTEND">End Time (DTEND):</label>
         <br>
         <p> YYYY=year, MM=month, DD=day, T is required there, HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
-        <p>YYYYMMDDTHHmmSS</p>
+        <p> YYYYMMDDTHHmmSS</p>
         <textarea name="DTEND"
                   placeholder="YYYYMMDDTHHmmSS"
                   rows="1"
@@ -46,10 +59,10 @@
         <!-- HH=hour(military), mm=minutes SS=seconds  -->
         <label for="Duration">Duration:</label>
         <br>
-        <p> HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
-        <p>HHmmSS</p>
+        <p> Duration of class in hours and minutes:</p>
+        <p> ex. 1H15M</p>
         <textarea name="Duration"
-                  placeholder="HHmmSS"
+                  placeholder="1H15M"
                   rows="1"
                   cols="12"
                   >{{ request.form['Duration'] }}</textarea>
@@ -57,14 +70,15 @@
         <br>
 
         <!-- Not sure what teh DTSTAMP value is or if it's needed-->
+        <!-- DTStamp will be down on backend, will be time the event is created-->
 
         <!-- RRULE can just stay a fixed value if needed, like weekly will stay the same most likely keep this UNTIL all caps to see if it affects anything-->
         <label for="UNTIL">End Date (UNTIL):</label>
         <br>
-        <p> YYYY=year, MM=month, DD=day, T is required there, HH=hour(military), mm=minutes, SS=seconds (can just put 00)</p>
-        <p>YYYYMMDDTHHMMSS</p>
+        <p> Last day of event </p>
+        <p> ex. 12/16/2022</p>
         <textarea name="UNTIL"
-                  placeholder="YYYYMMDDTHHmmSS"
+                  placeholder="MM/DD/YYYY"
                   rows="1"
                   cols="20"
                   >{{ request.form['UNTIL'] }}</textarea>
@@ -72,9 +86,11 @@
         <br>
 
         <label for="BYDAY">Class Days (BYDAY):</label>
+        <p> By day - MO/TU/WE/TH/FR </p>
+        <p> ex. MO/WE/FR </p>
         <br>
         <textarea name="BYDAY"
-                  placeholder="MO,TU,WE,TH,FR"
+                  placeholder="MO/TU/WE/TH/FR"
                   rows="1"
                   cols="16"
                   >{{ request.form['BYDAY'] }}</textarea>
