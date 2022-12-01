@@ -1,4 +1,4 @@
-# Author: Xavier Arriaga
+# Author: Xavier Arriaga, Kaleb Liang
 """
 This is the CalendarModel Class, aka Calendar.
 It is the main class for creating, updating, and removing events.
