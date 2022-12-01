@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Add a New Event {% endblock %}</h1>
+    <form method="post">
+        <!-- This entry is for SUMMARY variable -->
+        <label for="Summary">Class Name (Summary):</label>
+        <br>
+        <input type="text" name="Summary"
+               placeholder="Type Here"
+               value="{{ request.form['Summary'] }}"></input>
+        <br>
+        <br>
+
+        <!-- This entry is for DTSTART variable -->
+        <!-- YYYY=year, MM=month, DD=day, T is needed? -->
+        <!-- HH=hour(military), mm=minutes SS=seconds  -->
+        <label for="DTSTART">Start Date (DTSTART pt1):</label>
+        <br>
+        <p> month/day/year</p>
+        <p> ex. 01/17/2022</p>
+        <textarea name="DTSTART"
+                  placeholder="MM/DD/YYYY"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['DTSTART'] }}</textarea>
+        <br>
+        <br>
+
+        <label for="StartTime">Start Time (DTSTART pt2):</label>
+        <br>
+        <p> Non-military time that the class starts at</p>
+        <p> ex. 03:15PM, must include AM or PM</p>
+        <textarea name="StartTime"
+                  placeholder="##:##PM or ##:##AM"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['StartTime'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- This entry is for DURATION variable -->
+        <!-- HH=hour(military), mm=minutes SS=seconds  -->
+        <label for="Duration">Duration:</label>
+        <br>
+        <p> Duration of class in hours and minutes:</p>
+        <p> ex. 1H15M</p>
+        <textarea name="Duration"
+                  placeholder="1H15M"
+                  rows="1"
+                  cols="12"
+                  >{{ request.form['Duration'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- Not sure what teh DTSTAMP value is or if it's needed-->
+        <!-- DTStamp will be down on backend, will be time the event is created-->
+
+        <!-- RRULE can just stay a fixed value if needed, like weekly will stay the same most likely keep this UNTIL all caps to see if it affects anything-->
+        <label for="UNTIL">End Date (UNTIL):</label>
+        <br>
+        <p> Last day of event </p>
+        <p> ex. 12/16/2022</p>
+        <textarea name="UNTIL"
+                  placeholder="MM/DD/YYYY"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['UNTIL'] }}</textarea>
+        <br>
+        <br>
+
+        <label for="BYDAY">Class Days (BYDAY):</label>
+        <p> By day - MO/TU/WE/TH/FR </p>
+        <p> ex. MO/WE/FR </p>
+        <br>
+        <textarea name="BYDAY"
+                  placeholder="MO/TU/WE/TH/FR"
+                  rows="1"
+                  cols="16"
+                  >{{ request.form['BYDAY'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- This entry is for DESCRIPTION variable -->
+        <label for="Description">Description:</label>
+        <br>
+        <textarea name="Description"
+                  placeholder="Class Description"
+                  rows="20"
+                  cols="60"
+                  >{{ request.form['Description'] }}</textarea>
+        <br>
+        <br>
+
+        <!-- This entry is for LOCATION variable -->
+        <label for="Location">Location:</label>
+        <br>
+        <textarea name="Location"
+                  placeholder="Example Location"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['Location'] }}</textarea>
+        <br>
+        <br>
+        
+
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}
