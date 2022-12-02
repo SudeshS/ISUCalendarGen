@@ -35,7 +35,7 @@ DTSTAMP:20220902T151623
 DESCRIPTION:Technical & Professional Writing I Section:004
 END:VEVENT
 BEGIN:VEVENT
-UID:2232-4336@illinoisstate.edu
+UID:100
 SUMMARY:Principles Of Software Engineering
 LOCATION:STV 104
 DTSTART;TZID=America/Chicago:20220822T123500
@@ -45,7 +45,7 @@ DTSTAMP:20220902T151623
 DESCRIPTION:Principles Of Software Engineering Section:001
 END:VEVENT
 BEGIN:VEVENT
-UID:2232-4339@illinoisstate.edu
+UID:100
 SUMMARY:Concepts Of Programming Languages
 LOCATION:STV 108
 DTSTART;TZID=America/Chicago:20220822T110000
@@ -55,7 +55,7 @@ DTSTAMP:20220902T151623
 DESCRIPTION:Concepts Of Programming Languages Section:002
 END:VEVENT
 BEGIN:VEVENT
-UID:2232-4367@illinoisstate.edu
+UID:100
 SUMMARY:Principles Of Operating Systems
 LOCATION:OU 213E
 DTSTART;TZID=America/Chicago:20220822T110000
