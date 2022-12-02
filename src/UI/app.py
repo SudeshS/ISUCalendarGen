@@ -62,7 +62,7 @@ def uploadFiles():
 # Create page rendering
 
 
-@app.route('/create/')
+@app.route('/class_preview/')
 def index():
     return render_template('index.html', messages=messages)
     # these files are key to this working
@@ -70,7 +70,7 @@ def index():
 # Create handles the GET-ing of information from the form
 
 
-@app.route('/create/class/', methods=('GET', 'POST'))
+@app.route('/class_preview/class/', methods=('GET', 'POST'))
 def create():
     if request.method == 'POST':
         summary = request.form['Summary']
