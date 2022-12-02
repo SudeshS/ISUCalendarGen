@@ -116,9 +116,10 @@ def create_cal(event_list):
 
 def main():
     # CHANGE PATH FOR FINAL VERSION
-    f_path = 'data/input_isu_cal_i.ics'
-    event_list = parse_cal(f_path)
-    create_cal(event_list)
+    # f_path = 'data/input_isu_cal_i.ics'
+    # event_list = parse_cal(f_path)
+    # create_cal(event_list)
+    pass
 
 
 if __name__ == '__main__':
