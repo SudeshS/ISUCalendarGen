@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %} - FlaskApp</title>
+    <title>{% block title %} {% endblock %} -Class Preview</title>
     <style>
         .message {
             padding: 10px;
@@ -23,13 +23,28 @@
             background-color: #ffd5de;
         }
 
+        .button {
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        background-color: #FF0000;
+        }
+
     </style>
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('index') }}">FlaskApp</a>
+        <a href="{{ url_for('index') }}">Class Preview</a>
         <a href="{{ url_for('create') }}">Create</a>
+        <a href="{{ url_for('upload') }}">Upload</a>
         <!-- <a href="#">About</a> -->
+        
     </nav>
     <hr>
     <div class="content">
@@ -37,6 +52,10 @@
             <div class="alert">{{ message }}</div>
         {% endfor %}
         {% block content %} {% endblock %}
+    </div>
+    <div>
+        <br>
+        <a class='button' href="path_to_file" download="proposed_file_name">Download</a>
     </div>
 </body>
 </html>
