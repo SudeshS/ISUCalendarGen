@@ -266,8 +266,8 @@ class CalendarModel:
             # CalendarModel.setCalendarID =
 
         # do we write a file here or save file?
-        # with open('ISUCalendarGen-1\src\data\input_isu_cal.ics', 'wb') as file:
-        #     file.write(cal.to_ical())
+        with open('data\output_isu_cal.ics', 'wb') as file:
+            file.write(cal.to_ical())
 
         return cal
 
