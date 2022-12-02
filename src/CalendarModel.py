@@ -16,7 +16,7 @@ from datetime import datetime, time
 class CalendarModel:
     def __init__(self, calendarID, uid, summary, location, start, duration, rule, dtStamp, desc):  # Declaring the class
         self.calendarID = calendarID
-        self.uid = uid
+        self.uid = uid  # may not need to store this
         self.summary = summary
         self.location = location
         self.start = start
@@ -46,6 +46,7 @@ class CalendarModel:
 
                     event_list.append(
                         CalendarModel(0, uid, summary, location, start, duration, rule, dtStamp, desc))
+                    # may not need to store uid
 
                 if line == "":
                     counter = counter + 1
@@ -190,6 +191,7 @@ class CalendarModel:
             # uid
             temp = event_list[i].uid.split(":", 1)
             event.add('uid', temp[1])
+            # might not need to add UID here
 
             # summary
             temp = event_list[i].summary.split(":", 1)
@@ -266,7 +268,7 @@ class CalendarModel:
             # CalendarModel.setCalendarID =
 
         # do we write a file here or save file?
-        with open('data\output_isu_cal.ics', 'wb') as file:
+        with open('data/output_isu_cal.ics', 'wb') as file:
             file.write(cal.to_ical())
 
         return cal
