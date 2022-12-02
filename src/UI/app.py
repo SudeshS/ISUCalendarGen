@@ -1,8 +1,15 @@
 # Author: Xavier Arriaga, Gordon (Tre) Blankenship
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
+import os
 from os.path import join, dirname, realpath
-from flask_sqlalchemy import SQLAlchemy
+
+##from iCalendar import Calendar, Event
+#from wtforms import Form, BooleanField, StringField, PasswordField, validators
+# ^ for validation if we have time for it, but this requires pip install Flask Flask-WTF
+
+# This is the url that our server runs on
+# host_URL =
 
 #### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
@@ -14,10 +21,8 @@ app.config['SECRET_KEY'] = 'cc30d0a491daf6a4ba282e9ea5f9dcfc994cb4b86d66f531'
 messages = [
 ]
 
-# enable debugging mode
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:isu@localhost/CalendarDatabase'
-
-db = SQLAlchemy(app)
+# debug mode toggle comment
+app.config["DEBUG"] = True
 
 # Upload folder
 # this is where things will be stored locally until they can
@@ -25,19 +30,11 @@ db = SQLAlchemy(app)
 UPLOAD_FOLDER = app.static_folder
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
 
-
-class CForm(db.Model):
-    __tablename__ = 'calendars'
-    id = db.Column(db.Integer, primary_key=True)
-    file = db.Column(db.Text)
-
-    def __init__(self, file):
-        self.file = file
-# Root URL - What the user connects to
+# Upload page rendering
 
 
-@app.route('/')
-def index():
+@app.route('/upload/')
+def upload():
     # Set the upload HTML template '\templates\index.html'
     return render_template('upload.html')
 
@@ -49,20 +46,17 @@ def uploadFiles():
     # get the uploaded file
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
-        file = uploaded_file
-        cform = CForm(file)
-        db.session.add(cform)
-        db.session.commit()
-        #file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+        file_path = os.path.join(
+            app.config['UPLOAD_FOLDER'], uploaded_file.filename)
         # set the file path
-        # uploaded_file.save(file_path)
+        uploaded_file.save(file_path)
         # save the file
     return redirect(url_for('upload'))
 
 # Create page rendering
 
 
-@app.route('/class_preview/')
+@app.route('/')
 def index():
     return render_template('index.html', messages=messages)
     # these files are key to this working
@@ -100,9 +94,9 @@ def create():
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
 
+    return render_template('create.html')
 
-with app.app_context():
-    db.create_all()
 
+# Location should be kept not required alongside some others likely (description?)
 if (__name__ == '__main__'):
     app.run(port=5000)
