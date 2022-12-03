@@ -3,6 +3,7 @@ from flask_login import LoginManager
 import os
 from os.path import join, dirname, realpath
 from flask_sqlalchemy import SQLAlchemy
+from icalendar import Calendar, Event
 
 # login_manager = LoginManager()
 app = Flask(__name__)
@@ -34,17 +35,24 @@ def index():
 @app.route("/", methods=['POST'])
 def uploadFiles():
     # get the uploaded file
-    uploaded_file = request.files['file']
-    if uploaded_file.filename != '':
-        file = uploaded_file
+    uploadfile = request.files['file']
+    if uploadfile.filename != '':
+        readfile = uploadfile.read()
+        file = "'{}'".format(readfile)
         cform = CForm(file)
         db.session.add(cform)
         db.session.commit()
+        file2 = 'fuck off asshole'
+        cform = CForm(file2)
+        db.session.add(cform)
+        db.session.commit()
+
         #file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
         # set the file path
         #uploaded_file.save(file_path)
         # save the file
     return redirect(url_for('index'))
+
 
 with app.app_context():
     db.create_all()

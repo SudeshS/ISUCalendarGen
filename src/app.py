@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
-#from iCalendar import Calendar, Event
+from icalendar import Calendar, Event
 from flask_sqlalchemy import SQLAlchemy
 
 #### NOTE: might have to rename to app.py for it to run properly ####
