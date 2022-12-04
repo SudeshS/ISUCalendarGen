@@ -4,7 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 #### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:isu@localhost/calendarform'
+app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:isu@localhost/calendarform' #username:postgres password:isu server:@localhost database name: calendarform, replace
+                                                                                         #with your respective info as needed
 
 db=SQLAlchemy(app)
 
