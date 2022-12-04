@@ -19,7 +19,7 @@ def test_parse_no_events():   # guest test parse calendar with no events
 
 # test 2
 def test_guest_with_events():  # guest test parse calendar with four events
-    f_path = 'data/input_isu_cal_ii.ics'
+    f_path = 'data/input_isu_cal_iii.ics'
     test_cal = CalendarModel.parse_cal(f_path)
 
     if CalendarModel.checkCalendarFormat(test_cal):
