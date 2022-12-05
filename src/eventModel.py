@@ -31,7 +31,7 @@ class EventModel:
         return cal
 
     # merges events
-    def mergeEvents():
+    def mergeCalendars():
         pass
 
     # parses calendar ---- prob goes in calendarModel

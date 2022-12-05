@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Classes {% endblock %}</h1>
+    <h1>{% block title %} Events {% endblock %}</h1>
     {% for message in messages %}
         <div class='message'>
+            <p> ID: {{ messages.index(message)}}</p>
             <h3>{{ message['Summary'] }}</h3>
             <p>{{ message['DTSTART'] }}</p>
             <p>{{ message['StartTime'] }}</p>
@@ -12,6 +13,20 @@
             <p>{{ message['BYDAY'] }}</p>
             <p>{{ message['Description'] }}</p>
             <p>{{ message['Location'] }}</p>
+            <!--<form action="/class-preview/edit-class/" method="get">
+                <button type="submit" name="EventNum" value = "{{ request.form['EventNum'] }}">Edit</button>
+             -->
+            
+            <!--
+            {% set eventNum = messages.index(message)%}
+            </form> -->
+
+            <a class='button' href="{{ url_for('edit') }}"
+            {{ messages.index(message)}}>Edit an Event</a> 
+            
+            <a class='button' href="{{ url_for('remove') }}">Remove an Event</a> 
+
         </div>
+        
     {% endfor %}
 {% endblock %}

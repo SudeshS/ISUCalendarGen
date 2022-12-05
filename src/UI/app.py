@@ -18,8 +18,9 @@ app.config['SECRET_KEY'] = 'cc30d0a491daf6a4ba282e9ea5f9dcfc994cb4b86d66f531'
 # Messages is just a name, I was gonna switch it to classes
 # but I couldn't get it to work for the time being, so keep it for now
 # unless you know how to fix it
-messages = [
+messages = [ 
 ]
+
 
 # debug mode toggle comment
 app.config["DEBUG"] = True
@@ -59,12 +60,12 @@ def uploadFiles():
 @app.route('/')
 def index():
     return render_template('index.html', messages=messages)
-    # these files are key to this working
+    # these template files are key to this working
 
 # Create handles the GET-ing of information from the form
 
 
-@app.route('/class_preview/class/', methods=('GET', 'POST'))
+@app.route('/class-preview/class/', methods=('GET', 'POST'))
 def create():
     if request.method == 'POST':
         summary = request.form['Summary']
@@ -90,11 +91,59 @@ def create():
         elif not BYDAY:
             flash('BYDAY is required')
         else:
-            messages.append({'Summary': summary, 'DTSTART': DTStart, 'Duration': Duration,
+            messages.append({'Summary': summary, 'DTSTART': DTStart, 'StartTime':StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
 
     return render_template('create.html')
+
+@app.route('/class-preview/edit-class/', methods=('GET', 'POST'))
+def edit():
+    if request.method == 'POST':
+        eventNum = request.form['EventNum']
+        summary = request.form['Summary']
+        DTStart = request.form['DTSTART']  # start date
+        StartTime = request.form['StartTime']  # start time
+        Duration = request.form['Duration']
+        UNTIL = request.form['UNTIL']
+        BYDAY = request.form['BYDAY']
+        Description = request.form['Description']
+        Location = request.form['Location']
+        # DTStamp will be down on backend, will be time the event is created
+
+        if not summary:
+            flash('Class Name is required!')
+        elif not DTStart:
+            flash('Start Date is required!')
+        elif not StartTime:
+            flash('Start Time is required')
+        elif not Duration:
+            flash('Duration is required')
+        elif not UNTIL:
+            flash('UNTIL is required')
+        elif not BYDAY:
+            flash('BYDAY is required')
+        elif (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
+            flash('The Event number does not exist')
+        else:
+            messages[int(eventNum)] = ({'Summary': summary, 'DTSTART': DTStart, 'StartTime':StartTime, 'Duration': Duration,
+                            'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
+            return redirect(url_for('index'))
+
+    return render_template('edit.html')
+
+
+@app.route('/class-preview/remove-class/', methods=('GET', 'POST'))
+def remove():
+    if request.method == 'POST':
+        eventNum = int(request.form['EventNum'])
+        if (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
+            flash('The Event number does not exist')
+        else:
+            messages.pop(eventNum)
+            return redirect(url_for('index'))
+
+    return render_template('remove.html')
 
 
 # Location should be kept not required alongside some others likely (description?)
