@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %} {% endblock %} -Class Preview</title>
+    <center>
     <style>
         .message {
             padding: 10px;
             margin: 5px;
-            background-color: #f3f3f3
         }
         nav a {
-            color: #d64161;
+            color: #CE1126;
             font-size: 3em;
             margin-left: 50px;
             text-decoration: none;
+            background-color: #000000;
+            border-radius: 25px;
+            padding: 5px;
         }
 
         .alert {
@@ -36,8 +39,8 @@
         background-color: #FF0000;
         }
 
-    </style>
-</head>
+    </style></center>
+<center></head>
 <body>
     <nav>
         <a href="{{ url_for('index') }}">Class Preview</a>
@@ -57,5 +60,5 @@
         <br>
         <a class='button' href="path_to_file" download="proposed_file_name">Download</a>
     </div>
-</body>
+</body></center>
 </html>

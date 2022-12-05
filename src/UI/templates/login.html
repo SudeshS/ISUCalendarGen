@@ -1,0 +1,26 @@
+<!doctype html>
+  <center><head>
+    <title>ISU Calendar Generator - Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div class="container">
+      <br>
+      <h1>Login to ISU Calendar Generator</h1>
+      <br>
+      <button class="button button1">Continue as Guest</button>
+      <form action="" method="post">
+        <input type="text" placeholder="Username" name="username" value="{{
+          request.form.username }}">
+         <input type="password" placeholder="Password" name="password" value="{{
+          request.form.password }}">
+          <input class="btn btn-default" type="submit" value="Login">
+      </form>
+      <button class="button button2">Create Account</button>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+  </body></center>
+</html>
