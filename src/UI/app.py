@@ -66,7 +66,6 @@ def create_account():
             error = 'Please make sure the passwords match.'
         else:
             # **************SAVE TO DATABASE THE NEW USER HERE**********************
-            
             return redirect(url_for('home'))
 
     return render_template('createAccount.html', error=error)
