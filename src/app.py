@@ -14,15 +14,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
 
-class CForm(db.Model):
-  __tablename__ = 'calendars'
-  id = db.Column(db.Integer,primary_key=True)
-  file = db.Column(db.Text)
+class Calendar(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  filename = db.Column(db.Text)
+  file_data = db.Column(db.Text)
 
-  def __init__(self,file):
-    self.file = file
+  def __init__(self, filename, file_data):
+    self.filename = filename
+    self.file_data = file_data
 
-
+with app.app_context():
+    db.create_all()
 
 # Upload folder
 # this is where things will be stored locally until they can
@@ -79,12 +81,14 @@ def upload():
 def uploadFiles():
     # get the uploaded file
     uploaded_file = request.files['file']
-    if uploaded_file.filename != '':
-        file_path = os.path.join(
-            app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-        # set the file path
-        uploaded_file.save(file_path)
-        # save the file
+    filename = uploaded_file.filename
+    if filename != '':
+        #file_data = f"{uploaded_file.read()}"
+        file_data = f"{uploaded_file.read().decode('utf-8')}"
+        calendar = Calendar(filename, file_data)
+        db.session.add(calendar)
+        db.session.commit()
+
     return redirect(url_for('upload'))
 
 
