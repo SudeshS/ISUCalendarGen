@@ -36,8 +36,6 @@ class CForm(db.Model):
         self.Description=Description
         self.Location=Location
 
-
-
 @app.route('/')
 def index():
     return render_template('index.html', messages=messages)
