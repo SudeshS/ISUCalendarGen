@@ -28,6 +28,7 @@ db = SQLAlchemy(app)
 # but I couldn't get it to work for the time being, so keep it for now
 # unless you know how to fix it
 messages = [
+    {'Summary': 'asdf', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
 ]
 
 
@@ -113,7 +114,6 @@ def create():
         BYDAY = request.form['BYDAY']
         Description = request.form['Description']
         Location = request.form['Location']
-        # DTStamp will be down on backend, will be time the event is created
 
         if not summary:
             flash('Class Name is required!')
@@ -134,9 +134,9 @@ def create():
         else:
             messages.append({'Summary': summary, 'StartDate': StartDate, 'StartTime': StartTime,'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
-            #arr.append(summary, StartDate, StartTime, Duration, UNTIL, BYDAY, Description, Location)
-
-            event = CalendarModel.addEvents(list(messages[0].values()))
+            
+            # change 0 index?
+            event = CalendarModel.addEvents(list(messages))
             # cal.add_component(add_event)
             new_line = '\n'
             v_cal = 'END:VCALENDAR'
@@ -189,7 +189,6 @@ def edit():
         BYDAY = request.form['BYDAY']
         Description = request.form['Description']
         Location = request.form['Location']
-        # DTStamp will be down on backend, will be time the event is created
 
         if not summary:
             flash('Class Name is required!')
@@ -215,26 +214,26 @@ def edit():
 
 @app.route('/class-preview/remove-class/', methods=('GET', 'POST'))
 def remove():
-    print("removing dumbass")
     if request.method == 'POST':
-        print("removing dumbass dumbass")
+        # how do we get specific calendar/filename?
+        filename = 'static/uploads/test_calendar.ics'
         eventNum = int(request.form['EventNum'])
-        if (int(eventNum) > len(messages)) or (int(eventNum) < 0):
+        if (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
             flash('The Event number does not exist')
+            # doesnt let me remove 0
         else:
-            print("removing dumbass dumbass dumbass")
-            print(messages[0])
+            CalendarModel.removeEvents(filename, list(messages[eventNum].values()))
             messages.pop(eventNum)
             return redirect(url_for('index'))
 
-    eventNum = int(request.form['EventNum'])
-    if (int(eventNum) > len(messages)) or (int(eventNum) < 0):
-        flash('The Event number does not exist')
-    else:
-        print("removing dumbass dumbass dumbass")
-        print(messages[0])
-        messages.pop(eventNum)
-        return redirect(url_for('index'))
+    # eventNum = int(request.form['EventNum'])
+    # if (int(eventNum) > len(messages)) or (int(eventNum) < 0):
+    #     flash('The Event number does not exist')
+    # else:
+    #     print("removing dumbass dumbass dumbass")
+    #     print(messages[0])
+    #     messages.pop(eventNum)
+    #     return redirect(url_for('index'))
 
     return render_template('remove.html')
 
