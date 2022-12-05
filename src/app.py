@@ -1,20 +1,29 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+from accountHandler import AccountHandler as User
 
 
 app = Flask(__name__)
-
-# debug mode toggle comment
+app.config['SECRET_KEY'] = 'cc30d0a491daf6a4ba282e9ea5f9dcfc994cb4b86d66f531'
 app.config["DEBUG"] = True
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
 messages = []
+
+# Upload folder
+UPLOAD_FOLDER = app.static_folder
+app.config['UPLOAD_FOLDER'] = f"{UPLOAD_FOLDER}/uploads" # For macos/linux
+#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
 
 # Database config, loads environment variables from .env file (don't put that file in github)
 load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
-
 
 class Calendar(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -28,16 +37,85 @@ class Calendar(db.Model):
 with app.app_context():
     db.create_all()
 
-# Upload folder
-# this is where things will be stored locally until they can
-# be integrated into the database
-UPLOAD_FOLDER = app.static_folder
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
+
+# Login (on connection)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    error = None
+
+    if request.method == 'POST':
+        uname = request.form['username']
+        pword = request.form['password']
+        user1 = User(uname, pword)
+        if not user1.login():
+            error = 'Invalid Credentials. Please try again or create a new Account!'
+        else:
+            return redirect(url_for('home'))
+    
+    return render_template('login.html', error=error)
+
+
+@app.route('/create_account/', methods=['GET', 'POST'])
+def create_account():
+    error = None
+
+    if request.method == 'POST':
+        uname = request.form['username']
+        pword1 = request.form['password1']
+        pword2 = request.form['password2']
+        if pword1 != pword2:
+            error = 'Please make sure the passwords match.'
+        else:
+            # **************SAVE TO DATABASE THE NEW USER HERE**********************
+            
+            return redirect(url_for('home'))
+
+    return render_template('createAccount.html', error=error)
+
+@app.route('/home/')
+def home():
+    return render_template('home.html')
+
+
+@app.route('/upload/')
+def upload():
+    # Set the upload HTML template '\templates\index.html'
+    return render_template('upload.html')
+
+
+@app.route('/upload/', methods=['POST'])
+def uploadFiles():
+    # get the uploaded file
+    # uploaded_file = request.files['file']
+    # filename = uploaded_file.filename
+    # if filename != '':
+    #     #file_data = f"{uploaded_file.read()}"
+    #     file_data = f"{uploaded_file.read().decode('utf-8')}"
+    #     calendar = Calendar(filename, file_data)
+    #     db.session.add(calendar)
+    #     db.session.commit()
+
+    uploaded_file = request.files['file']
+    if uploaded_file.filename != '':
+        file_path = os.path.join(
+            app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+        # set the file path
+        uploaded_file.save(file_path)
+        # save the file
+
+    return redirect(url_for('upload'))
+
+
+# Create page rendering
+@app.route('/create/')
 def index():
     return render_template('index.html', messages=messages)
+    # these files are key to this working
 
 
 @app.route('/class_preview/class/', methods=('GET', 'POST'))
@@ -71,27 +149,6 @@ def create():
             return redirect(url_for('index'))
 
     return render_template('create.html')
-
-
-@app.route('/upload/')
-def upload():
-    # Set the upload HTML template '\templates\index.html'
-    return render_template('upload.html')
-
-
-@app.route('/upload/', methods=['POST'])
-def uploadFiles():
-    # get the uploaded file
-    uploaded_file = request.files['file']
-    filename = uploaded_file.filename
-    if filename != '':
-        #file_data = f"{uploaded_file.read()}"
-        file_data = f"{uploaded_file.read().decode('utf-8')}"
-        calendar = Calendar(filename, file_data)
-        db.session.add(calendar)
-        db.session.commit()
-
-    return redirect(url_for('upload'))
 
 
 if (__name__ == '__main__'):

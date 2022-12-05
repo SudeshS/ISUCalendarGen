@@ -7,15 +7,17 @@ The UserModel class is also responsible for checking if a User has an account.
 """
 from DatabaseService import DatabaseService
 from CalendarModel import CalendarModel
+import accountHandler
 
 class UserModel:
     def __init__(self, userID, calendar): #Declaring the class
         self.userID = userID
         self.calendar = calendar
 
-    def getID(): #gets the User ID of this User 
-        #Not sure how to do this or if it should be a method within the DatabaseService Class
-        pass
+    def getID(self, user_ID): #gets the User ID of this User 
+        # retrieve the user from the db
+        # returns None if unavailable
+        dbs = DatabaseService(self)
 
     def uploadCalendar(self, connection): #uploads a calendar file to the program 
         #not sure how connection is going to work for this, maybe have it in the declariation for the class?
