@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_sqlalchemy import SQLAlchemy
 import os
+from dotenv import load_dotenv
 
 
 app = Flask(__name__)
@@ -9,7 +10,8 @@ app = Flask(__name__)
 app.config["DEBUG"] = True
 messages = []
 
-# Database config
+# Database config, loads environment variables from .env file (don't put that file in github)
+load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 

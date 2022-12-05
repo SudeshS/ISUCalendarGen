@@ -3,13 +3,14 @@
 
 ## Steps to Run from Terminal
 - cd into ISUCalendarGen
+- make sure you have .env file to connect to remote postgresql instance (don't push this file to git)
 - if you're using a virtualenv, active it (run `source venv/bin/activate`)
 - install dependencies by running `pip install -r requirements.txt`
-- run `export FLASK_APP=src`
+- cd into src/ 
 - run `flask run`
 
 
-## Steps to run with Docker with Postgres DB
+## Steps to run locally with Docker compose
 - cd into ISUCalendarGen
 - run `make docker-build`
 
