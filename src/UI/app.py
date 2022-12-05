@@ -1,5 +1,4 @@
 # Author: Xavier Arriaga, Gordon (Tre) Blankenship
-from CalendarModel import *
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
 import os
@@ -8,6 +7,7 @@ from os.path import join, dirname, realpath
 from flask_sqlalchemy import SQLAlchemy
 from icalendar import Calendar, Event
 sys.path.append("..")
+from CalendarModel import *
 # from static import uploads
 
 ##from iCalendar import Calendar, Event
@@ -132,7 +132,7 @@ def create():
         elif not Location:
             flash('Location is required')
         else:
-            messages.append({'Summary': summary, 'DTSTART': StartDate, 'Duration': Duration,
+            messages.append({'Summary': summary, 'StartDate': StartDate, 'StartTime': StartTime,'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             #arr.append(summary, StartDate, StartTime, Duration, UNTIL, BYDAY, Description, Location)
 
@@ -141,6 +141,26 @@ def create():
             new_line = '\n'
             v_cal = 'END:VCALENDAR'
 
+            with open('static/uploads/test_calendar.ics') as f:
+                for line in f:
+                    pass
+                last_line = line
+
+            if last_line == v_cal:
+                with open('static/uploads/test_calendar.ics', "r+", encoding = "utf-8") as file:
+
+                    file.seek(0, os.SEEK_END)
+
+                    pos = file.tell() - 1
+
+                    while pos > 0 and file.read(1) != "\n":
+                        pos -= 1
+                        file.seek(pos, os.SEEK_SET)
+
+                    if pos > 0:
+                        file.seek(pos, os.SEEK_SET)
+                        file.truncate()
+            
             with open('static/uploads/test_calendar.ics') as f:
                 for line in f:
                     pass
@@ -162,7 +182,7 @@ def edit():
     if request.method == 'POST':
         eventNum = request.form['EventNum']
         summary = request.form['Summary']
-        DTStart = request.form['DTSTART']  # start date
+        StartTime = request.form['StartTime']  # start date
         StartTime = request.form['StartTime']  # start time
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
@@ -173,7 +193,7 @@ def edit():
 
         if not summary:
             flash('Class Name is required!')
-        elif not DTStart:
+        elif not StartTime:
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
@@ -183,10 +203,10 @@ def edit():
             flash('UNTIL is required')
         elif not BYDAY:
             flash('BYDAY is required')
-        elif (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
+        elif (int(eventNum) > len(messages)) or (int(eventNum) < 0):
             flash('The Event number does not exist')
         else:
-            messages[int(eventNum)] = ({'Summary': summary, 'DTSTART': DTStart, 'StartTime': StartTime, 'Duration': Duration,
+            messages[int(eventNum)] = ({'Summary': summary, 'DTSTART': StartTime, 'StartTime': StartTime, 'Duration': Duration,
                                         'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
 
@@ -195,62 +215,26 @@ def edit():
 
 @app.route('/class-preview/remove-class/', methods=('GET', 'POST'))
 def remove():
+    print("removing dumbass")
     if request.method == 'POST':
+        print("removing dumbass dumbass")
         eventNum = int(request.form['EventNum'])
-        if (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
+        if (int(eventNum) > len(messages)) or (int(eventNum) < 0):
             flash('The Event number does not exist')
         else:
+            print("removing dumbass dumbass dumbass")
+            print(messages[0])
             messages.pop(eventNum)
             return redirect(url_for('index'))
 
-    return render_template('remove.html')
-
-
-@app.route('/class-preview/edit-class/', methods=('GET', 'POST'))
-def edit():
-    if request.method == 'POST':
-        eventNum = request.form['EventNum']
-        summary = request.form['Summary']
-        DTStart = request.form['DTSTART']  # start date
-        StartTime = request.form['StartTime']  # start time
-        Duration = request.form['Duration']
-        UNTIL = request.form['UNTIL']
-        BYDAY = request.form['BYDAY']
-        Description = request.form['Description']
-        Location = request.form['Location']
-        # DTStamp will be down on backend, will be time the event is created
-
-        if not summary:
-            flash('Class Name is required!')
-        elif not DTStart:
-            flash('Start Date is required!')
-        elif not StartTime:
-            flash('Start Time is required')
-        elif not Duration:
-            flash('Duration is required')
-        elif not UNTIL:
-            flash('UNTIL is required')
-        elif not BYDAY:
-            flash('BYDAY is required')
-        elif (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
-            flash('The Event number does not exist')
-        else:
-            messages[int(eventNum)] = ({'Summary': summary, 'DTSTART': DTStart, 'StartTime': StartTime, 'Duration': Duration,
-                                        'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
-            return redirect(url_for('index'))
-
-    return render_template('edit.html')
-
-
-@app.route('/class-preview/remove-class/', methods=('GET', 'POST'))
-def remove():
-    if request.method == 'POST':
-        eventNum = int(request.form['EventNum'])
-        if (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
-            flash('The Event number does not exist')
-        else:
-            messages.pop(eventNum)
-            return redirect(url_for('index'))
+    eventNum = int(request.form['EventNum'])
+    if (int(eventNum) > len(messages)) or (int(eventNum) < 0):
+        flash('The Event number does not exist')
+    else:
+        print("removing dumbass dumbass dumbass")
+        print(messages[0])
+        messages.pop(eventNum)
+        return redirect(url_for('index'))
 
     return render_template('remove.html')
 
