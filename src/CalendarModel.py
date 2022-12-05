@@ -85,6 +85,8 @@ class CalendarModel:
         duration = time(hour=int(duration[0]), minute=int(duration[2:3]))
         event.add('duration', duration)
 
+        print(start_date, start_time)
+
         # AM/PM conversions
         try:
             # PM
@@ -103,10 +105,13 @@ class CalendarModel:
                     start_time = str(start_time[0:2]) + str(start_time[3:5])
 
             start = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(start_date[3:5]),
-                             hour=int(start_time[0:2]), minute=int(start_time[2:4]))
+                        hour=int(start_time[0:2]), minute=int(start_time[2:4]))
 
         except:
             print("\nStart time format incorrect")
+        # start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        # start_time = datetime.strptime(start_time, '%H:%M').time()
+        # start = datetime.combine(start_date, start_time)
 
         event.add('dtstart', start)
 
@@ -150,9 +155,9 @@ class CalendarModel:
         #
 
     # updates an event chosen by the user (might need to add an argument for that)
-    def updateEvent(self, cal, event_name):
+    def updateEvent(dict, event_name):
         # call removeEvents then call add events with new events
-        new_cal = CalendarModel.removeEvents(cal, event_name)
+        new_cal = CalendarModel.removeEvents(dict, event_name)
         CalendarModel.addEvents(new_cal)
 
         # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
