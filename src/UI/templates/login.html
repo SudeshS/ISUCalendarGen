@@ -9,15 +9,21 @@
       <br>
       <h1>Login to ISU Calendar Generator</h1>
       <br>
-      <button class="button button1">Continue as Guest</button>
+      <input type="submit" value="Continue as Guest" onclick="window.location.href='/home/'">
+      <br>
       <form action="" method="post">
+        <br>
         <input type="text" placeholder="Username" name="username" value="{{
           request.form.username }}">
+          <br>
          <input type="password" placeholder="Password" name="password" value="{{
           request.form.password }}">
+          <br><br>
           <input class="btn btn-default" type="submit" value="Login">
+          <br>
       </form>
-      <button class="button button2">Create Account</button>
+      <br>
+      <input type="submit" value="Create Account" onclick="window.location.href='/create_account/'">
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}
       {% endif %}

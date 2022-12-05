@@ -1,7 +1,7 @@
 # Author: Xavier Arriaga, Gordon (Tre) Blankenship
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
-import accountHandler as User
+from accountHandler import AccountHandler as User
 import os
 from os.path import join, dirname, realpath
 
@@ -36,7 +36,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
 # Login (on connection)
 @login_manager.user_loader
 def load_user(user_id):
-    return User.getID(user_id)
+    return User.get(user_id)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -44,16 +44,32 @@ def login():
     error = None
 
     if request.method == 'POST':
-        if request.form.get('action1') == 'Continue as Guest':
-            return redirect(url_for('home'))
-        elif request.form.get('action2') == 'Create Account':
-            return redirect(url_for('create_account'))
-        elif request.form['username'] != 'admin' or request.form['password'] != 'admin':
+        uname = request.form['username']
+        pword = request.form['password']
+        user1 = User(uname, pword)
+        if not user1.login():
             error = 'Invalid Credentials. Please try again or create a new Account!'
         else:
             return redirect(url_for('home'))
     
     return render_template('login.html', error=error)
+
+@app.route('/create_account/', methods=['GET', 'POST'])
+def create_account():
+    error = None
+
+    if request.method == 'POST':
+        uname = request.form['username']
+        pword1 = request.form['password1']
+        pword2 = request.form['password2']
+        if pword1 != pword2:
+            error = 'Please make sure the passwords match.'
+        else:
+            # **************SAVE TO DATABASE THE NEW USER HERE**********************
+            
+            return redirect(url_for('home'))
+
+    return render_template('createAccount.html', error=error)
 
 @app.route('/home/')
 def home():
@@ -62,7 +78,7 @@ def home():
 # Upload page rendering
 @app.route('/upload/')
 def upload():
-    # Set the upload HTML template '\templates\index.html'
+    # Set the upload HTML template '\templates\upload.html'
     return render_template('upload.html')
 
 # Uploading files
