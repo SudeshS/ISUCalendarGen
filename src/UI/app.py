@@ -38,14 +38,18 @@ def uploadFiles():
     uploadfile = request.files['file']
     if uploadfile.filename != '':
         readfile = uploadfile.read()
-        file = "'{}'".format(readfile)
+        file = '{}'.format(readfile)
         cform = CForm(file)
         db.session.add(cform)
         db.session.commit()
-        file2 = 'fuck off asshole'
-        cform = CForm(file2)
-        db.session.add(cform)
-        db.session.commit()
+        f = open('exportcalendar.ics', 'w')
+        saveCal = db.session.query(CForm).filter(CForm.id==28)
+        for saveFile in saveCal:
+            saveFile.file = saveFile.file.strip('\'')
+            saveFile.file = saveFile.file.replace('\\r\\n', '\n')
+            saveFile.file = saveFile.file.replace('b\'', '')
+            f.write(saveFile.file)
+        
 
         #file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
         # set the file path
