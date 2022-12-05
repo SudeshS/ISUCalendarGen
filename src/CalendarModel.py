@@ -47,6 +47,7 @@ class CalendarModel:
                     event_list.append(
                         CalendarModel(0, uid, summary, location, start, duration, rule, dtStamp, desc))
                     # may not need to store uid
+                    counter = 0 # might break code
 
                 if line == "":
                     counter = counter + 1
@@ -67,30 +68,22 @@ class CalendarModel:
         return True
 
     # adds an event to passed in cal parameter
-    def addEvents(self, cal):
+    def addEvents(dict):
         event = Event()
 
         #
         #
         # ----- replace inputs with frontend variables from calendarForm -----
-        duration = input("Duration of class (ex. 1H15M): ")
-        duration = time(hour=int(duration[0], minute=int(duration[2:3])))
-        event.add('duration', duration)
-
-        desc = input("Description: ")
-        event.add('description', desc)
-
-        summary = input("Summary: ")
+        # ---might need to change duration to xx:xx
+        summary = dict[0]
         event.add('summary', summary)
 
-        location = input("Location: ")
-        event.add('location', location)
+        start_date = dict[1]
+        start_time = dict[2]
 
-        start_date = input(
-            "Start Date (ex. 01/17/2022): ")
-
-        start_time = input(
-            "Start Time (ex. 03:15PM, must include AM or PM): ")
+        duration = dict[3]
+        duration = time(hour=int(duration[0]), minute=int(duration[2:3]))
+        event.add('duration', duration)
 
         # AM/PM conversions
         try:
@@ -117,13 +110,21 @@ class CalendarModel:
 
         event.add('dtstart', start)
 
-        byday = input(
-            "By day - MO/TU/WE/TH/FR\nex1. MO,WE,FR  |   ex2. TU,TH: ")
-        until = input("Last day of event (ex. 12/16/2022): ")
+        days = []
+        until = dict[4]
+        byday = dict[5]
+        byday = byday.split('/')  # num of days are dynamic
+        # if only one day
+        if (len(byday) == 1):
+            days.append(byday[0])
+        # else more than one day
+        else:
+            for x in range(len(byday)):
+                days.append(byday[x])
         # freq/byDay/until, convert until with datetime
         rrule = {
             'freq': 'WEEKLY',
-            'byday': byday,
+            'byday': days,
             'until': datetime(year=int(until[6:10]), month=int(until[0:2]), day=int(until[3:5]))
         }
         event.add('rrule', rrule)
@@ -131,11 +132,19 @@ class CalendarModel:
         # dtStamp: when ics file was created set current time when method is called
         # dtStamp
 
-        end = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(
-            start_date[3:5]), hour=int(duration[0], minute=int(duration[2:3])))
+        duration = dict[3]
+        end = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(start_date[3:5]),
+                        hour=int(duration[0]), minute=int(duration[2:4]))
         event.add('dtend', end)
 
-        cal.add_component(event)
+        desc = dict[6]
+        event.add('description', desc)
+
+        location = dict[7]
+        event.add('location', location)
+
+        # event.add_component(event)
+        return event
         # ----- replace inputs with frontend variables from calendarForm -----
         #
         #
@@ -215,10 +224,10 @@ class CalendarModel:
 
             days = []
             byday = byday[1].split(',')  # num of days are dynamic
-            # if only one class
+            # if only one day
             if (len(byday) == 1):
                 days.append(byday[0])
-            # else more than one class
+            # else more than one day
             else:
                 for x in range(len(byday)):
                     days.append(byday[x])
