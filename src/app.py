@@ -25,16 +25,33 @@ load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
+
+class User(db.Model):
+    user_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.Text)
+    password = db.Column(db.Text)
+    calendars = db.relationship('Calendar', backref='user')
+    
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+
 class Calendar(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
+  cal_id = db.Column(db.Integer, primary_key=True)
   filename = db.Column(db.Text)
   file_data = db.Column(db.Text)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
 
-  def __init__(self, filename, file_data):
+  def __init__(self, filename, file_data, user_id):
     self.filename = filename
     self.file_data = file_data
+    self.user_id = user_id
+
 
 with app.app_context():
+    db.drop_all()
+    db.session.commit()
     db.create_all()
 
 

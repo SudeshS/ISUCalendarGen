@@ -43,3 +43,15 @@ The following is what's happening when you run the make command:
 
 ### If you don't have Docker
 - install docker here: https://docs.docker.com/get-docker/
+
+## Steps to deploy to Heroku
+- install heroku cli: https://devcenter.heroku.com/articles/heroku-cli#install-the-heroku-cli
+- cd into ISUCalendarGen
+- run `docker build -t flaskapp .`
+- run `heroku login`
+- run `heroku container:login`
+- run `heroku container:push web -a isucalendargen`
+- run `heroku container:release web -a isucalendargen`
+
+- To open in browser: run `heroku open -a isucalendargen`
+- To look at live logs: run `heroku logs --tail -a isucalendargen`
