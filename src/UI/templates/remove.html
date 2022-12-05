@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Remove the Event {% endblock %}</h1>
+    <form method="post">
+
+        <label for="EventNum"> Event Number in Calendar: </label>
+        <input type="number" name="EventNum"> 
+        <!-- <input type="hidden" name="EventNum"> --> 
+        <br>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

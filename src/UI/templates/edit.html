@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Add a New Event {% endblock %}</h1>
+    <h1>{% block title %} Edit the Event {% endblock %}</h1>
     <form method="post">
+
+        <label for="EventNum"> Event Number in Calendar: </label>
+        <input type="number" name="EventNum"> 
+        <!-- <input type="hidden" name="EventNum"> --> 
+        <br>
+        <br>
+        
+
         <!-- This entry is for SUMMARY variable -->
         <label for="Summary">Event Name (Summary):</label>
         <br>
@@ -15,12 +23,11 @@
         <!-- This entry is for DTSTART variable -->
         <!-- YYYY=year, MM=month, DD=day, T is needed? -->
         <!-- HH=hour(military), mm=minutes SS=seconds  -->
-        <label for="StartDate">Start Date (DTSTART pt1):</label>
+        <label for="DTSTART">Start Date (DTSTART pt1):</label>
         <br>
         <p> month/day/year</p>
         <p> ex. 01/17/2022</p>
-        <textarea name="StartDate"
-        <input type="date" name="StartDate"> 
+        <input type="date" name="DTSTART"> 
         <!-- The input above takes a specific format in date,
         if that is too annoying to change, uncomment the below. 
         The format it takes is year-month-day -->
@@ -29,7 +36,8 @@
                   placeholder="MM/DD/YYYY"
                   rows="1"
                   cols="20"
-                  >{{ request.form['StartDate'] }}</textarea>
+                  >{{ request.form['DTSTART'] }}</textarea> 
+        -->
         <br>
         <br>
 
@@ -56,7 +64,7 @@
         <p> Duration of event in hours and minutes:</p>
         <p> ex. 1H15M</p>
         <!-- ex. 75-->
-        <!-- <input type="number" name="Duration" maxlength="4"> -->
+        <!-- <input type="number" name="Duration">-->
         <textarea name="Duration"
                   placeholder="1H15M"
                   rows="1"
@@ -85,7 +93,7 @@
         <br>
 
         <label for="BYDAY">Event Days (BYDAY):</label>
-        <p> By day - MO/TU/WE/TH/FR/SA/SU </p> <!-- Saturday Sunday?-->
+        <p> By day - MO/TU/WE/TH/FR/SA/SU </p>
         <p> ex. MO/WE/FR </p>
         <br>
         <textarea name="BYDAY"
