@@ -15,26 +15,26 @@ messages = [
             ]
 
 class CForm(db.Model):
-  __tablename__='calendars'
-  id=db.Column(db.Integer,primary_key=True)
-  summary=db.Column(db.String())
-  DTStart=db.Column(db.DateTime)
-  DTEnd=db.Column(db.DateTime)
-  Duration=db.Column(db.Time)
-  UNTIL=db.Column(db.DateTime)
-  BYDAY=db.Column(db.String())
-  Description=db.Column(db.Text)
-  Location=db.Column(db.Text)   
+    __tablename__='calendar'
+    id=db.Column(db.Integer,primary_key=True)
+    summary=db.Column(db.String())
+    DTStart=db.Column(db.DateTime)
+    DTEnd=db.Column(db.DateTime)
+    Duration=db.Column(db.Time)
+    UNTIL=db.Column(db.DateTime)
+    BYDAY=db.Column(db.String())
+    Description=db.Column(db.Text)
+    Location=db.Column(db.Text)   
 
-  def __init__(self,summary,DTStart,DTEnd,Duration,UNTIL,BYDAY,Description,Location):
-    self.summary=summary
-    self.DTStart=DTStart
-    self.DTEnd=DTEnd
-    self.Duration=Duration
-    self.UNTIL=UNTIL
-    self.BYDAY=BYDAY
-    self.Description=Description
-    self.Location=Location
+    def __init__(self,summary,DTStart,DTEnd,Duration,UNTIL,BYDAY,Description,Location):
+        self.summary=summary
+        self.DTStart=DTStart
+        self.DTEnd=DTEnd
+        self.Duration=Duration
+        self.UNTIL=UNTIL
+        self.BYDAY=BYDAY
+        self.Description=Description
+        self.Location=Location
 
 
 
