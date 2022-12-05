@@ -3,3 +3,4 @@ docker-build:
 
 docker-clean:
 	docker stop flaskapp; docker rm flaskapp; docker stop `docker ps -a -q`; docker rm `docker ps -a -q`; docker volume prune -f
+	
