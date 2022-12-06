@@ -1,4 +1,5 @@
 # Author: Xavier Arriaga, Gordon (Tre) Blankenship
+from CalendarModel import *
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
 import os
@@ -7,7 +8,6 @@ from os.path import join, dirname, realpath
 from flask_sqlalchemy import SQLAlchemy
 from icalendar import Calendar, Event
 sys.path.append("..")
-from CalendarModel import *
 # from static import uploads
 
 ##from iCalendar import Calendar, Event
@@ -28,7 +28,7 @@ db = SQLAlchemy(app)
 # but I couldn't get it to work for the time being, so keep it for now
 # unless you know how to fix it
 messages = [
-    
+
 ]
 
 
@@ -101,13 +101,13 @@ def index():
 # Create handles the GET-ing of information from the form
 
 
-@app.route('/class-preview/class/', methods=('GET', 'POST'))
+@app.route('/calendar-preview/event/', methods=('GET', 'POST'))
 def create():
     filename = 'static/uploads/test_calendar.ics'
 
     if request.method == 'POST':
         summary = request.form['Summary']
-        StartDate = request.form['StartDate']  # start date
+        startDate = request.form['StartDate']  # start date
         StartTime = request.form['StartTime']  # start time
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
@@ -117,7 +117,7 @@ def create():
 
         if not summary:
             flash('Class Name is required!')
-        elif not StartDate:
+        elif not startDate:
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
@@ -132,24 +132,25 @@ def create():
         elif not Location:
             flash('Location is required')
         else:
-            messages.append({'Summary': summary, 'StartDate': StartDate, 'StartTime': StartTime, 'Duration': Duration,
+            messages.append({'Summary': summary, 'StartDate': startDate, 'StartTime': StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
 
             # change 0 index?
-            event = CalendarModel.addEvents(messages[len(messages)-1], filename)
+            event = CalendarModel.addEvents(
+                messages[len(messages)-1], filename)
 
             return redirect(url_for('index'))
 
     return render_template('create.html')
 
 
-@app.route('/class-preview/edit-class/', methods=('GET', 'POST'))
+@app.route('/calendar-preview/edit-event/', methods=('GET', 'POST'))
 def edit():
     filename = 'static/uploads/test_calendar.ics'   # change
     if request.method == 'POST':
         eventNum = request.form['EventNum']
         summary = request.form['Summary']
-        StartTime = request.form['StartTime']  # start date
+        startDate = request.form['StartDate']  # start date
         StartTime = request.form['StartTime']  # start time
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
@@ -159,7 +160,7 @@ def edit():
 
         if not summary:
             flash('Class Name is required!')
-        elif not StartTime:
+        elif not startDate:
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
@@ -170,33 +171,33 @@ def edit():
         elif not BYDAY:
             flash('BYDAY is required')
         elif (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
-            flash('The Event number does not exist')
+            flash('This Event ID does not exist')
         else:
-            old_event = messages=[int(eventNum)]
+            old_event = messages = [int(eventNum)]
             messages[int(eventNum)] = ({'Summary': summary, 'DTSTART': StartTime, 'StartTime': StartTime, 'Duration': Duration,
                                         'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
-            CalendarModel.updateEvent(list(messages[int(eventNum)]), list(old_event.values()), filename)
+            CalendarModel.updateEvent(
+                list(messages[int(eventNum)]), list(old_event.values()), filename)
             return redirect(url_for('index'))
 
-    return render_template('edit.html')
+    return render_template('edit.html', messages=messages)
 
 
-@app.route('/class-preview/remove-class/', methods=('GET', 'POST'))
+@app.route('/calendar-preview/remove-event/', methods=('GET', 'POST'))
 def remove():
     if request.method == 'POST':
         # how do we get specific calendar/filename?
         filename = 'static/uploads/test_calendar.ics'
         eventNum = int(request.form['EventNum'])
         if (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
-            flash('The Event number does not exist')
-            # doesnt let me remove 0
+            flash('This Event ID does not exist')
         else:
             CalendarModel.removeEvents(
                 filename, list(messages[eventNum].values()))
             messages.pop(eventNum)
             return redirect(url_for('index'))
 
-    return render_template('remove.html')
+    return render_template('remove.html', messages=messages)
 
 
 # Location should be kept not required alongside some others likely (description?)
