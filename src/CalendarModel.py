@@ -14,23 +14,28 @@ from baseTable import Base, engine
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from AccountHandler import AccountHandler
+import os
 
+# END:VCALENDAR needs to be added at end of program
+# addEvents already adds this, implemenent a check before uploading/saving cal
 
 class CalendarTable(Base):
     __tablename__ = 'calendar'
-    __table_args__ = {'extend_existing':True}
-    id = Column(Integer, primary_key = True)
+    __table_args__ = {'extend_existing': True}
+    id = Column(Integer, primary_key=True)
     filename = Column(Text)
     file_data = Column(Text)
     user_id = Column(Integer, ForeignKey('user.id'))
     # user = relationship(AccountHandler)
-    
+
     def __init__(self, filename, file_data, user_id):
         self.filename = filename
         self.file_data = file_data
         self.user_id = user_id
 
+
 Base.metadata.create_all(engine)
+
 
 class CalendarModel:
     def __init__(self):
@@ -47,14 +52,18 @@ class CalendarModel:
                 temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]))
             return var_name, date
         ####
-        elif temp[0] == 'DURATION': # reading from imported cal
+        elif temp[0] == 'DURATION':  # reading from imported cal
             time_var = time(hour=int(temp[1][2:3]), minute=int(temp[1][4:6]))
             return temp[0], time_var
-        elif temp[0] == 'Duration': # reading from messages
+        elif temp[0] == 'Duration':  # reading from messages
             time_var = time(hour=int(temp[1][0]), minute=int(temp[1][2:4]))
             return temp[0], time_var
         elif temp[0].upper() == 'DURATION;VALUE=TIME':  # reading from addEvents
-            time_var = time(hour=int(temp[1][1]), minute=int(temp[1][2:4]))
+            if len(temp) == 2:
+                time_var = time(
+                    hour=int(temp[1][1:2]), minute=int(temp[1][2:4]))
+            else:
+                time_var = time(hour=int(temp[1]), minute=int(temp[2]))
             return temp[0], time_var
         elif temp[0].upper() == 'RRULE':
             rrule = temp[1].split(";")
@@ -79,7 +88,7 @@ class CalendarModel:
                 until = rrule[1].split("=")
 
             rrule_dict = {
-                'freq': freq[1],    #change to weekly?
+                'freq': freq[1],  # change to weekly?
                 'byday': days,
                 'until': datetime(year=int(until[1][0:4]), month=int(until[1][4:6]), day=int(until[1][6:8]))
             }
@@ -90,18 +99,25 @@ class CalendarModel:
             return temp[0], temp[1]
         else:
             pass
-            
 
     # parses calendar
+
     def parse_cal(filename):
         event_list = []
         with open(filename, 'r') as file:
-            summary, start, duration, rule, desc, location = "","","","","",""
+            summary, start, duration, rule, desc, location = "", "", "", "", "", ""
+            readline = False
             for line in file:
                 line = line.strip()
+                line = line.replace('\\n', '')
+
+
+                if line == 'BEGIN:VEVENT':
+                    readline = True
+                if not readline:
+                    continue
                 if line.startswith("SUMMARY"):
                     summary = line
-                    print(summary)
                 elif line.startswith("DTSTART"):
                     start = line
                 elif line.startswith("DURATION"):
@@ -115,36 +131,7 @@ class CalendarModel:
                 elif line.startswith("END:VEVENT"):
                     event_list.append(
                         EventModel(summary, location, start, duration, rule, desc))
-                # if line == "BEGIN:VEVENT\n":    # imported calendar
-                #     uid = file.readline()
-                #     uid_split = uid.split(":")
-                #     if uid_split[0] == 'UID':
-                #         summary = file.readline()
-                #         location = file.readline()
-                #         start = file.readline()
-                #         duration = file.readline()
-                #         if duration
-                #         rule = file.readline()
-                #         dtStamp = file.readline()
-                #         desc = file.readline()
-                #     else:                       # added events
-                #         summary = uid
-                #         start = file.readline()
-                #         duration = file.readline()
-                #         rule = file.readline()
-                #         desc = file.readline()
-                #         location = file.readline()
-
-
-                    # event_list.append(
-                    #     EventModel(summary, location, start, duration, rule, desc))
-                #    counter = 0 # might break code
-
-                # if line == "":
-                #     counter = counter + 1
-                #     if counter > 3:
-                #         break
-
+        
         return event_list
 
     # checks if the calendar is formated correctly
@@ -159,14 +146,14 @@ class CalendarModel:
         return True
 
     # adds an event to passed in cal parameter
-    def addEvents(dict):
+    def addEvents(dict, filename):
         event = Event()
         # most recent dict either at [0] or [len(dict)-1]
-        dict = dict[len(dict)-1]
+        # dict = dict[len(dict)-1]
 
         # ---might need to change duration to xx:xx
         # summary
-        temp = list(dict.items())[0] ######
+        temp = list(dict.items())[0]
         e_type, temp = CalendarModel.determine_var(temp)
         event.add(e_type, temp)
 
@@ -196,7 +183,7 @@ class CalendarModel:
                     start_time = str(start_time[0:2]) + str(start_time[3:5])
 
             start = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(start_date[3:5]),
-                        hour=int(start_time[0:2]), minute=int(start_time[2:4]))
+                             hour=int(start_time[0:2]), minute=int(start_time[2:4]))
 
         except:
             print("\nStart time format incorrect")
@@ -222,15 +209,14 @@ class CalendarModel:
         }
         event.add('rrule', rrule)
 
-        # dtStamp: when ics file was created set current time when method is called
-        # dtStamp
-
-        # duration = dict[3]
-        # end = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(start_date[3:5]),
-        #                 hour=int(duration[0]), minute=int(duration[2:4]))
-        # event.add('dtend', end)
-
-        end_datetime = datetime(year=start.year, month=start.month, day=start.day, hour=dur.hour, minute=dur.minute)
+        mins = start.minute + dur.minute
+        hours = start.hour + dur.hour
+        if mins > 60:
+            mins = mins - 60
+            hours += 1
+        
+        end_datetime = datetime(year=start.year, month=start.month,
+                                day=start.day, hour=int(hours), minute=int(mins))
         event.add('dtend', end_datetime)
 
         desc = list(dict.values())[6]
@@ -239,13 +225,49 @@ class CalendarModel:
         location = list(dict.values())[7]
         event.add('location', location)
 
+        new_line = '\n'
+        v_cal = 'END:VCALENDAR'
+
+        with open(filename) as f:
+            for line in f:
+                pass
+            last_line = line
+
+        if last_line == v_cal:
+            with open(filename, "r+", encoding="utf-8") as file:
+
+                file.seek(0, os.SEEK_END)
+
+                pos = file.tell() - 1
+
+                while pos > 0 and file.read(1) != "\n":
+                    pos -= 1
+                    file.seek(pos, os.SEEK_SET)
+
+                if pos > 0:
+                    file.seek(pos, os.SEEK_SET)
+                    file.truncate()
+
+        with open(filename) as f:
+            for line in f:
+                pass
+            last_line = line
+
+        with open(filename, 'ab') as file:
+            if last_line != '':
+                file.write(new_line.encode('utf-8'))
+            file.write(event.to_ical())
+            if last_line != v_cal:
+                file.write(v_cal.encode('utf-8'))
+
         return event
 
     # updates an event chosen by the user (might need to add an argument for that)
-    def updateEvent(dict, event_name):
+    def updateEvent(new_event, old_event, filename):
         # call removeEvents then call add events with new events
-        new_cal = CalendarModel.removeEvents(dict, event_name)
-        CalendarModel.addEvents(new_cal)
+        var = CalendarModel.removeEvents(filename, old_event)
+        if var:
+            CalendarModel.addEvents(new_event, filename)
 
         # although it might not matter for right now, actual users might want to have the ability to only edit one piece of info
 
@@ -254,9 +276,10 @@ class CalendarModel:
         new_cal = Calendar()
         new_cal.add('prodid', '-//Calendar Event Generator//')
         new_cal.add('version', '2.0')
-
+        return_flag = False
 
         event_list = CalendarModel.parse_cal(file)
+        # print(str(event_list))
         cal = CalendarModel.generateICSFile(event_list)
 
         # copies cal to new_cal without removed event
@@ -267,13 +290,13 @@ class CalendarModel:
             counter = 0
 
             for v in k:
-                print(v, k.get(v))
                 if counter < 1:  # will not enter if statement if no issues after 2nd iteration
                     var = k.get(v)
                     var = var.replace('\n', '')
                     # if name matches, set add_flag to true and break loop
                     if var.lower() == messages[0].lower():
                         add_flag = True
+                        return_flag = True
                         break
                 counter += 1
                 event.add(v, k.get(v))
@@ -281,11 +304,11 @@ class CalendarModel:
             # add_flag determines if event is added
             if add_flag == False:
                 new_cal.add_component(event)
-        
-        with open('UI/static/uploads/test_calendar.ics', 'wb') as file:
-            file.write(new_cal.to_ical())
 
-        return new_cal
+        with open('static/uploads/test_calendar.ics', 'wb') as file:
+            file.write(new_cal.to_ical().strip())
+
+        return return_flag
 
     # generates the ICSFile to be exported/downloaded (may need to return or print a string)
     def generateICSFile(event_list):
@@ -296,69 +319,47 @@ class CalendarModel:
         for i in range(len(event_list)):
             event = Event()
 
-            # temp variable used to store split line
-            # uid
-            # temp = event_list[i].uid.split(":", 1)
-            # event.add('uid', temp[1])
-
             # summary
             temp = event_list[i].summary.split(":", 1)
-            print("SUMMARY HERE:")
-            print(temp)
             e_type, temp = CalendarModel.determine_var(temp)
             event.add(e_type, temp)
 
             # duration
             temp = event_list[i].duration.split(":")
-            print(temp)
-            # time_var = time(hour=int(temp[1][2:3]), minute=int(temp[1][4:6]))
-            # event.add('duration', time_var)
             e_type, time_var = CalendarModel.determine_var(temp)
             event.add(e_type, time_var)
 
             # dtstart
-            print(event_list[i].start)
             temp = event_list[i].start.split(";", 1)
-            # date = datetime(year=int(temp[1][0:4]), month=int(
-            #     temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]))
-            # event.add('dtstart', date)
             e_type, start_var = CalendarModel.determine_var(temp)
             event.add(e_type, start_var)
 
             # rrule
             rrule = event_list[i].rule.split(":", 1)
             e_type, temp = CalendarModel.determine_var(rrule)
-            # rrule = rrule[1].split(";")
-            # freq = rrule[0].split("=")
-            # byday = rrule[1].split("=")
-
-            # days = []
-            # byday = byday[1].split(',')  # num of days are dynamic
-            # # if only one day
-            # if (len(byday) == 1):
-            #     days.append(byday[0])
-            # # else more than one day
-            # else:
-            #     for x in range(len(byday)):
-            #         days.append(byday[x])
-            # until = rrule[2].split("=")
-
-            # rrule_dict = {
-            #     'freq': 'WEEKLY',
-            #     'byday': days,
-            #     'until': datetime(year=int(until[1][0:4]), month=int(until[1][4:6]), day=int(until[1][6:8]))
-            # }
-            # event.add('rrule', rrule_dict)
             event.add(e_type, temp)
-
 
             # dtend NEED THIS
             temp = event_list[i].start.split(":", 1)
             ftemp = event_list[i].duration.split(":")
-            hour_var = int(ftemp[1][2:3])   # event hour duration
-            hour_var = hour_var + int(temp[1][9:11])
-
-            dur_minute = int(ftemp[1][4:6])  # event minute duration
+            print(ftemp)
+            if len(ftemp) == 2:
+                if len(ftemp[1]) == 5:
+                    hour_var = int(ftemp[1][1])   # event hour duration
+                    hour_var = hour_var + int(temp[1][9:11])
+                    dur_minute = int(ftemp[1][2:4])  # event minute duration
+                elif len(ftemp[1]) == 7:
+                    hour_var = int(ftemp[1][2]) 
+                    hour_var = hour_var + int(temp[1][9:11])
+                    dur_minute = int(ftemp[1][4:6])
+                else:
+                    hour_var = int(ftemp[1][1]) 
+                    hour_var = hour_var + int(temp[1][9:11])
+                    dur_minute = int(ftemp[1][2:4])
+            else:
+                hour_var = int(ftemp[1][1])
+                hour_var = hour_var + int(temp[1][9:11])
+                dur_minute = int(ftemp[2])
             start_minute = int(temp[1][11:13])  # event start minute
             dur_minute = dur_minute + start_minute
 
@@ -367,10 +368,9 @@ class CalendarModel:
                 hour_var = hour_var + 1
                 dur_minute = dur_minute - 60
 
-            # end_timedate = datetime(year=start_var.year, month=start_var.month, day=start_var.day, hour=time_var.hour, minute=time_var.minute)
             end_timedate = datetime(year=int(temp[1][0:4]), month=int(
                 temp[1][4:6]), day=int(temp[1][6:8]), hour=hour_var, minute=dur_minute)   # pass to dtend
-            
+
             event.add('dtend', end_timedate)
 
             # description
@@ -384,12 +384,6 @@ class CalendarModel:
             e_type, temp = CalendarModel.determine_var(temp)
             # event.add('location', temp[1])
             event.add(e_type, temp)
-
-            # dtstamp
-            # temp = event_list[i].dtStamp.split(":", 1)
-            # date = datetime(year=int(temp[1][0:4]), month=int(
-            #     temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]), second=int(temp[1][13:]))
-            # event.add('dtstamp', date)
 
             cal.add_component(event)
 

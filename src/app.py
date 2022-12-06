@@ -177,7 +177,7 @@ def index():
 
 @app.route('/calendar-preview/event/', methods=('GET', 'POST'))
 def create():
-    #event = Event()
+    filename = 'static/uploads/test_calendar.ics'
 
     if request.method == 'POST':
         summary = request.form['Summary']
@@ -209,8 +209,8 @@ def create():
             messages.append({'Summary': summary, 'StartDate': startDate, 'StartTime':StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
 
-            # change 0 index?
-            #event = CalendarModel.addEvents(list(messages))
+            event = CalendarModel.addEvents(messages[-1], filename)
+            
             return render_template('index.html', messages=messages, current_user=current_user)
 
     return render_template('create.html')
@@ -218,6 +218,7 @@ def create():
 
 @app.route('/calendar-preview/edit-event/', methods=('GET', 'POST'))
 def edit():
+    filename = 'static/uploads/test_calendar.ics'   # change
     if request.method == 'POST':
         eventNum = request.form['EventNum']
         summary = request.form['Summary']
@@ -244,8 +245,11 @@ def edit():
         elif (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
             flash('This Event ID does not exist')
         else:
+            old_event = messages[int(eventNum)]
             messages[int(eventNum)] = ({'Summary': summary, 'StartDate': startDate, 'StartTime': StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
+            CalendarModel.updateEvent(
+                messages[int(eventNum)], list(old_event.values()), filename) 
             return render_template('index.html', messages=messages, current_user=current_user)
 
     return render_template('edit.html', messages=messages, current_user=current_user)
