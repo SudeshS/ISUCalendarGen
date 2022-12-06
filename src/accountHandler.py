@@ -1,5 +1,5 @@
-from flask_login import UserMixin
-from baseTable import Base, engine
+from flask_login import UserMixin, login_user, logout_user
+from baseTable import Base, engine, db_session
 from sqlalchemy import Column, Integer, Text
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -22,21 +22,33 @@ class AccountHandler(UserMixin, Base):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    def createAccount(self, uname, pword):
-        self.username = uname
-        self.password = pword
+    @staticmethod
+    def createAccount(uname, pword):
+        existing_user = AccountHandler.query.filter_by(username=uname).first()
+        if existing_user is None:
+                user = AccountHandler(uname, pword)
+                db_session.add(user)
+                db_session.commit()
+                login_user(user)
+                return True
+        return False
 
     # boolean
-    def login(self):
+    @staticmethod
+    def login(uname, pword):
         # take username and password
         # check if in DB
         # if in DB, take to user's account in DB
         # else, login failed
-        return True
+        user = AccountHandler.query.filter_by(username=uname).first()
+        if user and user.check_password(pword):
+            login_user(user)
+            return True
+        return False
 
+    @staticmethod
     def logout():
-        # 
-        pass
+        logout_user()
 
     def deleteAccount():
         # self.username = input("Username: ")

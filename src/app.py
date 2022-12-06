@@ -79,6 +79,26 @@ def unauthorized():
     return redirect(url_for('login.html'))
 
 
+# @app.route('/', methods=['GET', 'POST'])
+# def login():
+#     if current_user.is_authenticated:
+#         return redirect(url_for('home'))
+
+#     error = None
+#     if request.method == 'POST':
+#         uname = request.form['username']
+#         pword = request.form['password']
+#         user = User.query.filter_by(username=uname).first()
+#         if user and user.check_password(pword):
+#             login_user(user)
+#             return render_template('home.html', current_user=current_user)
+#         else:
+#             error = 'Invalid Credentials. Please try again or create a new account'
+#             flash(error)
+#             return redirect(url_for('login'))
+    
+#     return render_template('login.html')
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -89,8 +109,9 @@ def login():
         uname = request.form['username']
         pword = request.form['password']
         user = User.query.filter_by(username=uname).first()
-        if user and user.check_password(pword):
-            login_user(user)
+        login_success = User.login(uname, pword)
+        if login_success:
+            #login_user(user)
             return render_template('home.html', current_user=current_user)
         else:
             error = 'Invalid Credentials. Please try again or create a new account'
@@ -103,9 +124,33 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()
+    #logout_user()
+    User.logout()
     return redirect(url_for('login'))
 
+
+# @app.route('/create_account/', methods=['GET', 'POST'])
+# def create_account():
+#     error = None
+#     if request.method == 'POST':
+#         uname = request.form['username']
+#         pword1 = request.form['password1']
+#         pword2 = request.form['password2']
+#         if pword1 != pword2:
+#             error = 'Please make sure the passwords match.'
+#             flash(error)
+#         else:
+#             # **************SAVE TO DATABASE THE NEW USER HERE**********************
+#             existing_user = User.query.filter_by(username=uname).first()
+#             if existing_user is None:
+#                 user = User(uname, pword1)
+#                 db.session.add(user)
+#                 db.session.commit()
+#                 login_user(user)
+#                 return render_template('home.html', current_user=current_user)
+#             flash('Error: A user already exists with that username.')
+
+#     return render_template('createAccount.html')
 
 @app.route('/create_account/', methods=['GET', 'POST'])
 def create_account():
@@ -119,12 +164,8 @@ def create_account():
             flash(error)
         else:
             # **************SAVE TO DATABASE THE NEW USER HERE**********************
-            existing_user = User.query.filter_by(username=uname).first()
-            if existing_user is None:
-                user = User(uname, pword1)
-                db.session.add(user)
-                db.session.commit()
-                login_user(user)
+            account_created = User.createAccount(uname, pword1)
+            if account_created:
                 return render_template('home.html', current_user=current_user)
             flash('Error: A user already exists with that username.')
 
