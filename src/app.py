@@ -53,7 +53,6 @@ def login():
     if request.method == 'POST':
         uname = request.form['username']
         pword = request.form['password']
-        user = User.query.filter_by(username=uname).first()
         login_success = User.login(uname, pword)
         if login_success:
             #login_user(user)
