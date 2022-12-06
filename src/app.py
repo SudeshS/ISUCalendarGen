@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, url_for, flash, redirect
+from flask import Flask, render_template, request, url_for, flash, redirect, send_file
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 from CalendarModel import *
-from accountHandler import AccountHandler as User
+import psycopg2
+#from accountHandler import AccountHandler as User
+
 
 
 app = Flask(__name__)
@@ -26,9 +28,11 @@ app.config['UPLOAD_FOLDER'] = f"{UPLOAD_FOLDER}/uploads" # For macos/linux
 #app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
 
 # Database config
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:isu@localhost/CalendarDatabase'
+con = psycopg2.connect(database="CalendarDatabase", user="postgres", password="isu", host="localhost", port="5432")
+cursor=con.cursor()
 db = SQLAlchemy(app)
-
 
 # Login (on connection)
 @login_manager.user_loader
@@ -96,7 +100,8 @@ def create_account():
 
 @app.route('/home/')
 def home():
-    return render_template('home.html', current_user=current_user)
+    result = db.session.execute("SELECT * FROM calendar")
+    return render_template("home.html", data=result, current_user=current_user)
 
 
 @app.route('/upload/')
@@ -104,29 +109,56 @@ def upload():
     # Set the upload HTML template '\templates\index.html'
     return render_template('upload.html', current_user=current_user)
 
-
+#upload file to database
 @app.route('/upload/', methods=['POST'])
 def uploadFiles():
-    # get the uploaded file
-    # uploaded_file = request.files['file']
-    # filename = uploaded_file.filename
-    # if filename != '':
-    #     #file_data = f"{uploaded_file.read()}"
-    #     file_data = f"{uploaded_file.read().decode('utf-8')}"
-    #     calendar = Calendar(filename, file_data)
-    #     db.session.add(calendar)
-    #     db.session.commit()
+    uploadfile = request.files['file']
+    if request.method == 'POST':
+        if uploadfile.filename != '':
+            filename=uploadfile.filename
+            readfile = uploadfile.read()
+            file_data = '{}'.format(readfile)
+            cform = Calendar(filename, file_data, current_user.id)
+            db.session.add(cform)
+            db.session.commit()
 
-    uploaded_file = request.files['file']
-    if uploaded_file.filename != '':
-        file_path = os.path.join(
-            app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-        # set the file path
-        uploaded_file.save(file_path)
-        # save the file
+            
 
-    return render_template('upload.html', current_user=current_user)
+            #file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+            # set the file path
+            #uploaded_file.save(file_path)
+            # save the file
+    return render_template('home.html', current_user=current_user,)
 
+#Preview list of calendars
+#@app.route('/home', methods=['POST'])
+#def display():
+    #result = db.session.execute("SELECT * FROM calendar")
+    #return render_template("home.html", data=result)
+
+#Download calendar from database
+@app.route("/calendarSave/<int:calendarid>")
+def calendarSave(calendarid):
+    filepath = os.path.dirname(__file__)
+    rel_path = "exportedcalendar.ics"
+    abs_file_path = os.path.join(filepath, rel_path)
+    f = open(abs_file_path, 'w')
+    saveCal = db.session.query(Calendar).filter(Calendar.id==calendarid)
+    for saveFile in saveCal:
+        saveFile.file_data = saveFile.file_data.strip('\'')
+        saveFile.file_data = saveFile.file_data.replace('\\r\\n', '\n')
+        saveFile.file_data = saveFile.file_data.replace('b\'', '')
+        f.write(saveFile.file_data)
+        f.close()
+    return send_file('exportedcalendar.ics', mimetype='text/calendar', as_attachment=True)
+
+#Delete calendar form database
+@app.route("/calendarDelete/<int:calendarid>")
+def calendarDelete(calendarid):
+    strDB="delete from calendar where id="+str(calendarid)
+    db.session.execute(strDB)
+    db.session.commit()
+    return render_template("home.html")
 
 # Create page rendering
 @app.route('/create/')
