@@ -13,7 +13,7 @@ from datetime import datetime, time
 from baseTable import Base, engine
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from accountHandler import AccountHandler
+from AccountHandler import AccountHandler
 
 
 class CalendarTable(Base):

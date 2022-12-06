@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from CalendarModel import *
 import psycopg2
-#from accountHandler import AccountHandler as User
+from AccountHandler import AccountHandler as User
 
 
 
@@ -118,7 +118,7 @@ def uploadFiles():
             filename=uploadfile.filename
             readfile = uploadfile.read()
             file_data = '{}'.format(readfile)
-            cform = Calendar(filename, file_data, current_user.id)
+            cform = CalendarTable(filename, file_data, current_user.id)
             db.session.add(cform)
             db.session.commit()
 
@@ -143,7 +143,7 @@ def calendarSave(calendarid):
     rel_path = "exportedcalendar.ics"
     abs_file_path = os.path.join(filepath, rel_path)
     f = open(abs_file_path, 'w')
-    saveCal = db.session.query(Calendar).filter(Calendar.id==calendarid)
+    saveCal = db.session.query(CalendarTable).filter(CalendarTable.id==calendarid)
     for saveFile in saveCal:
         saveFile.file_data = saveFile.file_data.strip('\'')
         saveFile.file_data = saveFile.file_data.replace('\\r\\n', '\n')
@@ -159,6 +159,14 @@ def calendarDelete(calendarid):
     db.session.execute(strDB)
     db.session.commit()
     return render_template("home.html")
+
+#access calendar modification
+@app.route("/calendarModify/<int:calendarid>")
+def calendarModify(calendarid):
+    strModify="SELECT * FROM calendar where id="+str(calendarid)
+    calendar=db.session.execute(strModify)
+    return render_template("modifyCalendar.html",calendarinfo=calendar)
+
 
 # Create page rendering
 @app.route('/create/')
