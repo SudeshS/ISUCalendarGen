@@ -120,7 +120,7 @@ def uploadFiles():
             cform = CalendarTable(filename, file_data, current_user.id)
             db.session.add(cform)
             db.session.commit()
-    return render_template('home.html', current_user=current_user,)
+    return redirect(url_for('home'))
 
 #Preview list of calendars
 #@app.route('/home', methods=['POST'])
@@ -150,7 +150,7 @@ def calendarDelete(calendarid):
     strDB="delete from calendar where id="+str(calendarid)
     db.session.execute(strDB)
     db.session.commit()
-    return render_template("home.html")
+    return redirect(url_for('home'))
 
 #access calendar modification
 #@app.route("/calendarModify/<int:calendarid>")

@@ -94,9 +94,8 @@
     <nav>
         <a href="{{ url_for('home') }}">Home</a>
         <a href="{{ url_for('index') }}">Calendar Preview</a>
-
-        <a href="{{ url_for('upload') }}">Upload</a>
         {% if current_user.is_authenticated %}
+            <a href="{{ url_for('upload') }}">Upload</a>
             <a href="/logout">Logout</a>
         {% endif %}
         {% if not current_user.is_authenticated %}
