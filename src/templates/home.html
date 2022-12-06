@@ -18,7 +18,7 @@
                         {% if datum.user_id == current_user.id %}
                       <td scope="row" class="td-names">{{datum.filename}}</td>
                       <td class="td-actions"><b><a class="two" href="{{url_for('calendarSave', calendarid=datum.id)}}">Save Calendar</a></b></td>
-                      <td class="td-actions"><b><a class="two" href="{{url_for('create', calendarid=datum.id)}}">Edit Calendar</a></b></td>
+                      <td class="td-actions"><b><a class="two" href="{{url_for('create', calendarid=datum.id)}}">Add Event</a></b></td>
                       <td class="td-actions"><b><a class="two" href="{{url_for('calendarDelete', calendarid=datum.id)}}">Delete Calendar</a></b></td>
                         {% endif %}
                     </tr>  

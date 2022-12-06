@@ -7,7 +7,8 @@ The UserModel class is also responsible for checking if a User has an account.
 """
 from DatabaseService import DatabaseService
 from CalendarModel import CalendarModel
-import accountHandler
+from EventModel import EventModel
+import AccountHandler
 
 class UserModel:
     def __init__(self, userID, calendar): #Declaring the class
@@ -27,7 +28,7 @@ class UserModel:
     def downloadCalendar(self, connection, calName): #downloads a calendar file from the program
         #also is this downloading from the database or from the website itself?
         dbs = DatabaseService(self.calendar, connection)
-        if (dbs.getCalendar == null):
+        if (dbs.getCalendar == None):
             cName = calName
             calModel = EventModel(self.calendar, cName)
             calModel.generateICSFile()

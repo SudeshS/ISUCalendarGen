@@ -54,8 +54,6 @@ def login():
         pword = request.form['password']
         login_success = User.login(uname, pword)
         if login_success:
-            login_user(user)
-            #return render_template('home.html', current_user=current_user)
             return redirect(url_for('home'))
         else:
             error = 'Invalid Credentials. Please try again or create a new account'
