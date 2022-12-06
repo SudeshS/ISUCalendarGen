@@ -7,23 +7,15 @@ It also deals with generating the ICSFile and generating a preview
 
 
 from CalendarPreview import CalendarPreview
-from eventModel import EventModel
+from EventModel import EventModel
 from calendar import month
 from icalendar import Calendar, Event
 from datetime import datetime, time
 
 
 class CalendarModel:
-    def __init__(self, summary, location, start, duration, rule, desc):  # Declaring the class
-        # self.calendarID = calendarID
-        # self.uid = uid         may not need to store this
-        self.summary = summary
-        self.location = location
-        self.start = start
-        self.duration = duration
-        self.rule = rule
-        # self.dtStamp = dtStamp
-        self.desc = desc
+    def __init__(self):
+        pass
 
     # determines how to parse a variable
     def determine_var(temp):
@@ -85,37 +77,54 @@ class CalendarModel:
     def parse_cal(filename):
         event_list = []
         with open(filename, 'r') as file:
-            counter = 0
-            while True:
-                line = file.readline()
-
-                if line == "BEGIN:VEVENT\n":    # imported calendar
-                    uid = file.readline()
-                    uid_split = uid.split(":")
-                    if uid_split[0] == 'UID':
-                        summary = file.readline()
-                        location = file.readline()
-                        start = file.readline()
-                        duration = file.readline()
-                        rule = file.readline()
-                        dtStamp = file.readline()
-                        desc = file.readline()
-                    else:                       # added events
-                        summary = uid
-                        start = file.readline()
-                        duration = file.readline()
-                        rule = file.readline()
-                        desc = file.readline()
-                        location = file.readline()
-
+            summary, start, duration, rule, desc, location = "","","","","",""
+            for line in file:
+                line = line.strip()
+                if line.startswith("SUMMARY"):
+                    summary = line
+                    print(summary)
+                elif line.startswith("DTSTART"):
+                    start = line
+                elif line.startswith("DURATION"):
+                    duration = line
+                elif line.startswith("RRULE"):
+                    rule = line
+                elif line.startswith("DESCRIPTION"):
+                    desc = line
+                elif line.startswith("LOCATION"):
+                    location = line
+                elif line.startswith("END:VEVENT"):
                     event_list.append(
-                        CalendarModel(summary, location, start, duration, rule, desc))
-                    counter = 0 # might break code
+                        EventModel(summary, location, start, duration, rule, desc))
+                # if line == "BEGIN:VEVENT\n":    # imported calendar
+                #     uid = file.readline()
+                #     uid_split = uid.split(":")
+                #     if uid_split[0] == 'UID':
+                #         summary = file.readline()
+                #         location = file.readline()
+                #         start = file.readline()
+                #         duration = file.readline()
+                #         if duration
+                #         rule = file.readline()
+                #         dtStamp = file.readline()
+                #         desc = file.readline()
+                #     else:                       # added events
+                #         summary = uid
+                #         start = file.readline()
+                #         duration = file.readline()
+                #         rule = file.readline()
+                #         desc = file.readline()
+                #         location = file.readline()
 
-                if line == "":
-                    counter = counter + 1
-                    if counter > 3:
-                        break
+
+                    # event_list.append(
+                    #     EventModel(summary, location, start, duration, rule, desc))
+                #    counter = 0 # might break code
+
+                # if line == "":
+                #     counter = counter + 1
+                #     if counter > 3:
+                #         break
 
         return event_list
 
@@ -229,7 +238,7 @@ class CalendarModel:
 
 
         event_list = CalendarModel.parse_cal(file)
-        cal = CalendarModel.generateICSFile(event_list) #stopped working here
+        cal = CalendarModel.generateICSFile(event_list)
 
         # copies cal to new_cal without removed event
         for k in cal.subcomponents:
@@ -253,7 +262,7 @@ class CalendarModel:
             # add_flag determines if event is added
             if add_flag == False:
                 new_cal.add_component(event)
-
+        
         with open('UI/static/uploads/test_calendar.ics', 'wb') as file:
             file.write(new_cal.to_ical())
 
@@ -275,6 +284,8 @@ class CalendarModel:
 
             # summary
             temp = event_list[i].summary.split(":", 1)
+            print("SUMMARY HERE:")
+            print(temp)
             e_type, temp = CalendarModel.determine_var(temp)
             event.add(e_type, temp)
 
@@ -284,7 +295,6 @@ class CalendarModel:
             # time_var = time(hour=int(temp[1][2:3]), minute=int(temp[1][4:6]))
             # event.add('duration', time_var)
             e_type, time_var = CalendarModel.determine_var(temp)
-            print(e_type, time_var)
             event.add(e_type, time_var)
 
             # dtstart
