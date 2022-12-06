@@ -30,41 +30,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
 
-# class User(UserMixin, db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     username = db.Column(db.Text, unique=True)
-#     password = db.Column(db.Text)
-#     calendars = db.relationship('Calendar', backref='user')
-    
-#     def __init__(self, username, password):
-#         self.username = username
-#         self.set_password(password)
-
-#     def set_password(self, password):
-#         self.password = generate_password_hash(password, method='sha256')
-
-#     def check_password(self, password):
-#         return check_password_hash(self.password, password)
-
-
-# class Calendar(db.Model):
-#   cal_id = db.Column(db.Integer, primary_key=True)
-#   filename = db.Column(db.Text)
-#   file_data = db.Column(db.Text)
-#   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-#   def __init__(self, filename, file_data, user_id):
-#     self.filename = filename
-#     self.file_data = file_data
-#     self.user_id = user_id
-
-
-# with app.app_context():
-#     db.drop_all()
-#     db.session.commit()
-#     db.create_all()
-
-
 # Login (on connection)
 @login_manager.user_loader
 def load_user(user_id):
@@ -78,26 +43,6 @@ def unauthorized():
     flash('You must be logged in to view that page.')
     return redirect(url_for('login.html'))
 
-
-# @app.route('/', methods=['GET', 'POST'])
-# def login():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('home'))
-
-#     error = None
-#     if request.method == 'POST':
-#         uname = request.form['username']
-#         pword = request.form['password']
-#         user = User.query.filter_by(username=uname).first()
-#         if user and user.check_password(pword):
-#             login_user(user)
-#             return render_template('home.html', current_user=current_user)
-#         else:
-#             error = 'Invalid Credentials. Please try again or create a new account'
-#             flash(error)
-#             return redirect(url_for('login'))
-    
-#     return render_template('login.html')
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -128,29 +73,6 @@ def logout():
     User.logout()
     return redirect(url_for('login'))
 
-
-# @app.route('/create_account/', methods=['GET', 'POST'])
-# def create_account():
-#     error = None
-#     if request.method == 'POST':
-#         uname = request.form['username']
-#         pword1 = request.form['password1']
-#         pword2 = request.form['password2']
-#         if pword1 != pword2:
-#             error = 'Please make sure the passwords match.'
-#             flash(error)
-#         else:
-#             # **************SAVE TO DATABASE THE NEW USER HERE**********************
-#             existing_user = User.query.filter_by(username=uname).first()
-#             if existing_user is None:
-#                 user = User(uname, pword1)
-#                 db.session.add(user)
-#                 db.session.commit()
-#                 login_user(user)
-#                 return render_template('home.html', current_user=current_user)
-#             flash('Error: A user already exists with that username.')
-
-#     return render_template('createAccount.html')
 
 @app.route('/create_account/', methods=['GET', 'POST'])
 def create_account():

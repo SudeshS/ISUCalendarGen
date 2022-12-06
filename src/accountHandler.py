@@ -36,10 +36,6 @@ class AccountHandler(UserMixin, Base):
     # boolean
     @staticmethod
     def login(uname, pword):
-        # take username and password
-        # check if in DB
-        # if in DB, take to user's account in DB
-        # else, login failed
         user = AccountHandler.query.filter_by(username=uname).first()
         if user and user.check_password(pword):
             login_user(user)
