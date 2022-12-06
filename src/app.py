@@ -26,10 +26,7 @@ app.config['UPLOAD_FOLDER'] = f"{UPLOAD_FOLDER}/uploads" # For macos/linux
 #app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
 
 # Database config
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:isu@localhost/CalendarDatabase'
-con = psycopg2.connect(database="CalendarDatabase", user="postgres", password="isu", host="localhost", port="5432")
-cursor=con.cursor()
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
 # Login (on connection)
