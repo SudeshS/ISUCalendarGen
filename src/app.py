@@ -58,8 +58,9 @@ def login():
         user = User.query.filter_by(username=uname).first()
         login_success = User.login(uname, pword)
         if login_success:
-            #login_user(user)
-            return render_template('home.html', current_user=current_user)
+            login_user(user)
+            #return render_template('home.html', current_user=current_user)
+            return redirect(url_for('home'))
         else:
             error = 'Invalid Credentials. Please try again or create a new account'
             flash(error)
@@ -119,13 +120,6 @@ def uploadFiles():
             cform = CalendarTable(filename, file_data, current_user.id)
             db.session.add(cform)
             db.session.commit()
-
-            
-
-            #file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-            # set the file path
-            #uploaded_file.save(file_path)
-            # save the file
     return render_template('home.html', current_user=current_user,)
 
 #Preview list of calendars
