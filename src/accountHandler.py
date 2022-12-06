@@ -14,7 +14,7 @@ class AccountHandler(UserMixin, Base):
     # ---- only isLoggedIn is a parameter in class diagram
     def __init__(self, uname, pword):
         self.username = uname
-        self.password = pword
+        self.set_password(pword)
 
     def set_password(self, password):
         self.password = generate_password_hash(password, method='sha256')

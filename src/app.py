@@ -89,7 +89,6 @@ def login():
         uname = request.form['username']
         pword = request.form['password']
         user = User.query.filter_by(username=uname).first()
-
         if user and user.check_password(pword):
             login_user(user)
             return render_template('home.html', current_user=current_user)
