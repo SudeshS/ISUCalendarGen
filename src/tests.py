@@ -9,6 +9,17 @@ import server, UserModel
 # accountHandler tests
 def accountHandlerTest():
     
+    user = accountHandler.AccountHandler('admin', 'password')
+
+    # login check
+    assert accountHandler.login('admin', 'password') == True
+    assert accountHandler.login('fake', 'account') == False
+    
+    # getUsername/Password checks
+    assert user.getUsername() == 'admin'
+    assert user.getPassword() == 'password'
+
+
 # AccountModel tests
 
 # CalendarModel tests
