@@ -1,4 +1,5 @@
 # Author: Xavier Arriaga, Gordon (Tre) Blankenship
+from EventModel import *
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
 import os
@@ -7,7 +8,6 @@ from os.path import join, dirname, realpath
 from flask_sqlalchemy import SQLAlchemy
 from icalendar import Calendar, Event
 sys.path.append("..")
-from CalendarModel import *
 # from static import uploads
 
 ##from iCalendar import Calendar, Event
@@ -28,7 +28,8 @@ db = SQLAlchemy(app)
 # but I couldn't get it to work for the time being, so keep it for now
 # unless you know how to fix it
 messages = [
-    {'Summary': 'asdf', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
+    {'Summary': 'asdf', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {
+        'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
 ]
 
 
@@ -132,11 +133,11 @@ def create():
         elif not Location:
             flash('Location is required')
         else:
-            messages.append({'Summary': summary, 'StartDate': StartDate, 'StartTime': StartTime,'Duration': Duration,
+            messages.append({'Summary': summary, 'StartDate': StartDate, 'StartTime': StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
-            
+
             # change 0 index?
-            event = CalendarModel.addEvents(list(messages))
+            event = EventModel.addEvents(list(messages))
             # cal.add_component(add_event)
             new_line = '\n'
             v_cal = 'END:VCALENDAR'
@@ -147,7 +148,7 @@ def create():
                 last_line = line
 
             if last_line == v_cal:
-                with open('static/uploads/test_calendar.ics', "r+", encoding = "utf-8") as file:
+                with open('static/uploads/test_calendar.ics', "r+", encoding="utf-8") as file:
 
                     file.seek(0, os.SEEK_END)
 
@@ -160,7 +161,7 @@ def create():
                     if pos > 0:
                         file.seek(pos, os.SEEK_SET)
                         file.truncate()
-            
+
             with open('static/uploads/test_calendar.ics') as f:
                 for line in f:
                     pass
@@ -222,7 +223,8 @@ def remove():
             flash('The Event number does not exist')
             # doesnt let me remove 0
         else:
-            CalendarModel.removeEvents(filename, list(messages[eventNum].values()))
+            EventModel.removeEvents(
+                filename, list(messages[eventNum].values()))
             messages.pop(eventNum)
             return redirect(url_for('index'))
 

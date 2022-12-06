@@ -6,7 +6,7 @@ It is the main class for everything related to the User directly, such as upload
 The UserModel class is also responsible for checking if a User has an account. 
 """
 from DatabaseService import DatabaseService
-from CalendarModel import CalendarModel
+from EventModel import EventModel
 
 class UserModel:
     def __init__(self, userID, calendar): #Declaring the class
@@ -27,7 +27,7 @@ class UserModel:
         dbs = DatabaseService(self.calendar, connection)
         if (dbs.getCalendar == null):
             cName = calName
-            calModel = CalendarModel(self.calendar, cName)
+            calModel = EventModel(self.calendar, cName)
             calModel.generateICSFile()
         else:
             cal = dbs.getCalendar(self.calendar)

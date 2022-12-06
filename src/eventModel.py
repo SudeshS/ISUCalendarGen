@@ -5,14 +5,15 @@ from icalendar import Calendar, Event
 from datetime import datetime, time
 
 class EventModel:
-    def __init__(self, uid, summary, location, start, duration, rule, dtStamp, desc):
-        self.uid = uid
+    def __init__(self, summary, location, start, duration, rule, desc):  # Declaring the class
+        # self.calendarID = calendarID
+        # self.uid = uid         may not need to store this
         self.summary = summary
         self.location = location
         self.start = start
         self.duration = duration
         self.rule = rule
-        self.dtStamp = dtStamp
+        # self.dtStamp = dtStamp
         self.desc = desc
 
     # edit calendar events --- might not need
