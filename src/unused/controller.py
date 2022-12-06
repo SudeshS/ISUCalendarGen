@@ -1,7 +1,7 @@
 # Class to handle the displaying of certain messages
 from accountHandler import *
 from UserModel import *
-from CalendarModel import *
+from EventModel import *
 
 
 class Controller:

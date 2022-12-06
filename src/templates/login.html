@@ -11,6 +11,11 @@
       <br>
       <input type="submit" value="Continue as Guest" onclick="window.location.href='/home/'">
       <br>
+      {% for message in get_flashed_messages() %}
+      <div class="error">
+        {{ message }}
+      </div>
+      {% endfor %}
       <form action="" method="post">
         <br>
         <input type="text" placeholder="Username" name="username" value="{{

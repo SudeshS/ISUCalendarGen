@@ -1,98 +1,160 @@
-# Author: Xavier Arriaga, Gordon (Tre) Blankenship
-from CalendarModel import *
 from flask import Flask, render_template, request, url_for, flash, redirect
-from flask_login import LoginManager
-from accountHandler import AccountHandler as User
-import os
-import sys
-from os.path import join, dirname, realpath
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from icalendar import Calendar, Event
-sys.path.append("..")
-# from static import uploads
+import os
+from dotenv import load_dotenv
+from CalendarModel import *
+from accountHandler import AccountHandler as User
 
-##from iCalendar import Calendar, Event
-#from wtforms import Form, BooleanField, StringField, PasswordField, validators
-# ^ for validation if we have time for it, but this requires pip install Flask Flask-WTF
 
-# This is the url that our server runs on
-# host_URL =
-
-#### NOTE: might have to rename to app.py for it to run properly ####
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'cc30d0a491daf6a4ba282e9ea5f9dcfc994cb4b86d66f531'
+
+# load environment variables from .env file
+load_dotenv()
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config["DEBUG"] = True
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Messages is just a name, I was gonna switch it to classes
-# but I couldn't get it to work for the time being, so keep it for now
-# unless you know how to fix it
-messages = [
-    {'Summary': 'asdf', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {
-        'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
-]
-
-
-# debug mode toggle comment
-app.config["DEBUG"] = True
+messages = []
 
 # Upload folder
-# this is where things will be stored locally until they can
-# be integrated into the database
 UPLOAD_FOLDER = app.static_folder
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
+app.config['UPLOAD_FOLDER'] = f"{UPLOAD_FOLDER}/uploads" # For macos/linux
+#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
+
+# Database config
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+db = SQLAlchemy(app)
+
+
+# class User(UserMixin, db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.Text, unique=True)
+#     password = db.Column(db.Text)
+#     calendars = db.relationship('Calendar', backref='user')
+    
+#     def __init__(self, username, password):
+#         self.username = username
+#         self.set_password(password)
+
+#     def set_password(self, password):
+#         self.password = generate_password_hash(password, method='sha256')
+
+#     def check_password(self, password):
+#         return check_password_hash(self.password, password)
+
+
+# class Calendar(db.Model):
+#   cal_id = db.Column(db.Integer, primary_key=True)
+#   filename = db.Column(db.Text)
+#   file_data = db.Column(db.Text)
+#   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+#   def __init__(self, filename, file_data, user_id):
+#     self.filename = filename
+#     self.file_data = file_data
+#     self.user_id = user_id
+
+
+# with app.app_context():
+#     db.drop_all()
+#     db.session.commit()
+#     db.create_all()
+
 
 # Login (on connection)
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    if user_id is not None:
+        return User.query.get(user_id)
+    return None
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('You must be logged in to view that page.')
+    return redirect(url_for('login.html'))
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
 
     error = None
-
     if request.method == 'POST':
         uname = request.form['username']
         pword = request.form['password']
-        user1 = User(uname, pword)
-        if not user1.login():
-            error = 'Invalid Credentials. Please try again or create a new Account!'
+        user = User.query.filter_by(username=uname).first()
+
+        if user and user.check_password(pword):
+            login_user(user)
+            return render_template('home.html', current_user=current_user)
         else:
-            return redirect(url_for('home'))
+            error = 'Invalid Credentials. Please try again or create a new account'
+            flash(error)
+            return redirect(url_for('login'))
     
-    return render_template('login.html', error=error)
+    return render_template('login.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 
 @app.route('/create_account/', methods=['GET', 'POST'])
 def create_account():
     error = None
-
     if request.method == 'POST':
         uname = request.form['username']
         pword1 = request.form['password1']
         pword2 = request.form['password2']
         if pword1 != pword2:
             error = 'Please make sure the passwords match.'
+            flash(error)
         else:
             # **************SAVE TO DATABASE THE NEW USER HERE**********************
-            return redirect(url_for('home'))
+            existing_user = User.query.filter_by(username=uname).first()
+            if existing_user is None:
+                user = User(uname, pword1)
+                db.session.add(user)
+                db.session.commit()
+                login_user(user)
+                return render_template('home.html', current_user=current_user)
+            flash('Error: A user already exists with that username.')
 
-    return render_template('createAccount.html', error=error)
+    return render_template('createAccount.html')
+
 
 @app.route('/home/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', current_user=current_user)
 
-# Upload page rendering
+
 @app.route('/upload/')
 def upload():
-    # Set the upload HTML template '\templates\upload.html'
-    return render_template('upload.html')
+    # Set the upload HTML template '\templates\index.html'
+    return render_template('upload.html', current_user=current_user)
 
-# Uploading files
+
 @app.route('/upload/', methods=['POST'])
 def uploadFiles():
     # get the uploaded file
+    # uploaded_file = request.files['file']
+    # filename = uploaded_file.filename
+    # if filename != '':
+    #     #file_data = f"{uploaded_file.read()}"
+    #     file_data = f"{uploaded_file.read().decode('utf-8')}"
+    #     calendar = Calendar(filename, file_data)
+    #     db.session.add(calendar)
+    #     db.session.commit()
+
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
         file_path = os.path.join(
@@ -100,15 +162,15 @@ def uploadFiles():
         # set the file path
         uploaded_file.save(file_path)
         # save the file
-    return redirect(url_for('upload'))
+
+    return render_template('upload.html', current_user=current_user)
+
 
 # Create page rendering
 @app.route('/create/')
 def index():
-    return render_template('index.html', messages=messages)
-    # these template files are key to this working
-
-# Create handles the GET-ing of information from the form
+    return render_template('index.html', messages=messages, current_user=current_user)
+    # these files are key to this working
 
 
 @app.route('/calendar-preview/event/', methods=('GET', 'POST'))
@@ -146,45 +208,11 @@ def create():
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
 
             # change 0 index?
-            event = CalendarModel.addEvents(list(messages))
-            # cal.add_component(add_event)
-            new_line = '\n'
-            v_cal = 'END:VCALENDAR'
-
-            with open('static/uploads/test_calendar.ics') as f:
-                for line in f:
-                    pass
-                last_line = line
-
-            if last_line == v_cal:
-                with open('static/uploads/test_calendar.ics', "r+", encoding="utf-8") as file:
-
-                    file.seek(0, os.SEEK_END)
-
-                    pos = file.tell() - 1
-
-                    while pos > 0 and file.read(1) != "\n":
-                        pos -= 1
-                        file.seek(pos, os.SEEK_SET)
-
-                    if pos > 0:
-                        file.seek(pos, os.SEEK_SET)
-                        file.truncate()
-
-            with open('static/uploads/test_calendar.ics') as f:
-                for line in f:
-                    pass
-                last_line = line
-
-            with open('static/uploads/test_calendar.ics', 'ab') as file:
-                file.write(new_line.encode('utf-8'))
-                file.write(event.to_ical())
-                if last_line != v_cal:
-                    file.write(v_cal.encode('utf-8'))
-
-            return redirect(url_for('index'))
+            #event = CalendarModel.addEvents(list(messages))
+            return render_template('index.html', messages=messages, current_user=current_user)
 
     return render_template('create.html')
+
 
 @app.route('/calendar-preview/edit-event/', methods=('GET', 'POST'))
 def edit():
@@ -216,9 +244,9 @@ def edit():
         else:
             messages[int(eventNum)] = ({'Summary': summary, 'StartDate': startDate, 'StartTime': StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
-            return redirect(url_for('index'))
+            return render_template('index.html', messages=messages, current_user=current_user)
 
-    return render_template('edit.html', messages=messages)
+    return render_template('edit.html', messages=messages, current_user=current_user)
 
 
 @app.route('/calendar-preview/remove-event/', methods=('GET', 'POST'))
@@ -233,11 +261,11 @@ def remove():
             CalendarModel.removeEvents(
                 filename, list(messages[eventNum].values()))
             messages.pop(eventNum)
-            return redirect(url_for('index'))
+            return render_template('index.html', messages=messages, current_user=current_user)
 
-    return render_template('remove.html', messages=messages)
+    return render_template('remove.html', messages=messages, current_user=current_user)
 
 
-# Location should be kept not required alongside some others likely (description?)
 if (__name__ == '__main__'):
-    app.run(port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)

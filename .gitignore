@@ -1,5 +1,9 @@
 .DS_Store
 venv/
+<<<<<<< HEAD
+*.pyc
+.env
+=======
 src/venv/
 *.pyc
 
@@ -14,3 +18,5 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+.env
+>>>>>>> 21a6d3ad684e7686f048e634f5dd4dcba3c1863f
