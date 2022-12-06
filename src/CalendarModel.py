@@ -45,11 +45,19 @@ class CalendarModel:
     def determine_var(temp):
         if temp[0].upper() == 'SUMMARY':
             return temp[0], temp[1]
-        elif temp[0].upper() == 'DTSTART':
+        elif temp[0].upper() == 'DTSTART;TZID=AMERICA/CHICAGO':
             var_name = temp[0]
-            temp = temp[1].split(":")
+            #temp = temp[1].split(":")
             date = datetime(year=int(temp[1][0:4]), month=int(
                 temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]))
+            print(var_name)
+            return var_name, date
+        elif temp[0].upper() == 'DTSTART':
+            var_name = temp[0]
+            #temp = temp[1].split(":")
+            date = datetime(year=int(temp[1][0:4]), month=int(
+                temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]))
+            print(var_name)
             return var_name, date
         ####
         elif temp[0] == 'DURATION':  # reading from imported cal
@@ -305,7 +313,7 @@ class CalendarModel:
             if add_flag == False:
                 new_cal.add_component(event)
 
-        with open('static/uploads/test_calendar.ics', 'wb') as file:
+        with open('localfile.ics', 'wb') as file:
             file.write(new_cal.to_ical().strip())
 
         return return_flag
@@ -330,7 +338,7 @@ class CalendarModel:
             event.add(e_type, time_var)
 
             # dtstart
-            temp = event_list[i].start.split(";", 1)
+            temp = event_list[i].start.split(":", 1)
             e_type, start_var = CalendarModel.determine_var(temp)
             event.add(e_type, start_var)
 

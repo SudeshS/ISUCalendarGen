@@ -54,8 +54,9 @@ def login():
         pword = request.form['password']
         login_success = User.login(uname, pword)
         if login_success:
-            #login_user(user)
-            return render_template('home.html', current_user=current_user)
+            login_user(user)
+            #return render_template('home.html', current_user=current_user)
+            return redirect(url_for('home'))
         else:
             error = 'Invalid Credentials. Please try again or create a new account'
             flash(error)
@@ -115,14 +116,7 @@ def uploadFiles():
             cform = CalendarTable(filename, file_data, current_user.id)
             db.session.add(cform)
             db.session.commit()
-
-            
-
-            #file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-            # set the file path
-            #uploaded_file.save(file_path)
-            # save the file
-    return render_template('home.html', current_user=current_user,)
+    return redirect(url_for('home'))
 
 #Preview list of calendars
 #@app.route('/home', methods=['POST'])
@@ -152,7 +146,7 @@ def calendarDelete(calendarid):
     strDB="delete from calendar where id="+str(calendarid)
     db.session.execute(strDB)
     db.session.commit()
-    return render_template("home.html")
+    return redirect(url_for('home'))
 
 #access calendar modification
 #@app.route("/calendarModify/<int:calendarid>")
