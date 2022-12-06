@@ -5,13 +5,34 @@ It is the main class for creating, updating, and removing events.
 It also deals with generating the ICSFile and generating a preview
 """
 
-
 from CalendarPreview import CalendarPreview
 from EventModel import EventModel
 from calendar import month
 from icalendar import Calendar, Event
 from datetime import datetime, time
+from baseTable import Base, engine
+from sqlalchemy import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship
+from accountHandler import AccountHandler
 import os
+
+
+class CalendarTable(Base):
+    __tablename__ = 'calendar'
+    __table_args__ = {'extend_existing': True}
+    id = Column(Integer, primary_key=True)
+    filename = Column(Text)
+    file_data = Column(Text)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    # user = relationship(AccountHandler)
+
+    def __init__(self, filename, file_data, user_id):
+        self.filename = filename
+        self.file_data = file_data
+        self.user_id = user_id
+
+
+Base.metadata.create_all(engine)
 
 
 class CalendarModel:
@@ -29,15 +50,16 @@ class CalendarModel:
                 temp[1][4:6]), day=int(temp[1][6:8]), hour=int(temp[1][9:11]), minute=int(temp[1][11:13]))
             return var_name, date
         ####
-        elif temp[0] == 'DURATION': # reading from imported cal
+        elif temp[0] == 'DURATION':  # reading from imported cal
             time_var = time(hour=int(temp[1][2:3]), minute=int(temp[1][4:6]))
             return temp[0], time_var
-        elif temp[0] == 'Duration': # reading from messages
+        elif temp[0] == 'Duration':  # reading from messages
             time_var = time(hour=int(temp[1][0]), minute=int(temp[1][2:4]))
             return temp[0], time_var
         elif temp[0].upper() == 'DURATION;VALUE=TIME':  # reading from addEvents
             if len(temp) == 2:
-                time_var = time(hour=int(temp[1][1:2]), minute=int(temp[1][2:4]))
+                time_var = time(
+                    hour=int(temp[1][1:2]), minute=int(temp[1][2:4]))
             else:
                 time_var = time(hour=int(temp[1]), minute=int(temp[2]))
             return temp[0], time_var
@@ -64,7 +86,7 @@ class CalendarModel:
                 until = rrule[1].split("=")
 
             rrule_dict = {
-                'freq': freq[1],    #change to weekly?
+                'freq': freq[1],  # change to weekly?
                 'byday': days,
                 'until': datetime(year=int(until[1][0:4]), month=int(until[1][4:6]), day=int(until[1][6:8]))
             }
@@ -75,13 +97,13 @@ class CalendarModel:
             return temp[0], temp[1]
         else:
             pass
-            
 
     # parses calendar
+
     def parse_cal(filename):
         event_list = []
         with open(filename, 'r') as file:
-            summary, start, duration, rule, desc, location = "","","","","",""
+            summary, start, duration, rule, desc, location = "", "", "", "", "", ""
             for line in file:
                 line = line.strip()
                 line = line.replace('\\n', '')
@@ -152,7 +174,7 @@ class CalendarModel:
                     start_time = str(start_time[0:2]) + str(start_time[3:5])
 
             start = datetime(year=int(start_date[6:10]), month=int(start_date[0:2]), day=int(start_date[3:5]),
-                        hour=int(start_time[0:2]), minute=int(start_time[2:4]))
+                             hour=int(start_time[0:2]), minute=int(start_time[2:4]))
 
         except:
             print("\nStart time format incorrect")
@@ -178,7 +200,8 @@ class CalendarModel:
         }
         event.add('rrule', rrule)
 
-        end_datetime = datetime(year=start.year, month=start.month, day=start.day, hour=dur.hour, minute=dur.minute)
+        end_datetime = datetime(year=start.year, month=start.month,
+                                day=start.day, hour=dur.hour, minute=dur.minute)
         event.add('dtend', end_datetime)
 
         desc = list(dict.values())[6]
@@ -217,7 +240,7 @@ class CalendarModel:
 
         with open(filename, 'ab') as file:
             if last_line != '':
-                file.write(new_line.encode('utf-8'))   
+                file.write(new_line.encode('utf-8'))
             file.write(event.to_ical())
             if last_line != v_cal:
                 file.write(v_cal.encode('utf-8'))
@@ -239,7 +262,6 @@ class CalendarModel:
         new_cal.add('prodid', '-//Calendar Event Generator//')
         new_cal.add('version', '2.0')
         return_flag = False
-
 
         event_list = CalendarModel.parse_cal(file)
         cal = CalendarModel.generateICSFile(event_list)
@@ -269,7 +291,7 @@ class CalendarModel:
 
         with open('UI/static/uploads/test_calendar.ics', 'wb') as file:
             file.write(new_cal.to_ical().strip())
-        
+
         return return_flag
 
     # generates the ICSFile to be exported/downloaded (may need to return or print a string)
@@ -301,7 +323,6 @@ class CalendarModel:
             e_type, temp = CalendarModel.determine_var(rrule)
             event.add(e_type, temp)
 
-
             # dtend NEED THIS
             temp = event_list[i].start.split(":", 1)
             ftemp = event_list[i].duration.split(":")
@@ -323,7 +344,7 @@ class CalendarModel:
 
             end_timedate = datetime(year=int(temp[1][0:4]), month=int(
                 temp[1][4:6]), day=int(temp[1][6:8]), hour=hour_var, minute=dur_minute)   # pass to dtend
-            
+
             event.add('dtend', end_timedate)
 
             # description
