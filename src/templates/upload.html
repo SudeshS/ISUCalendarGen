@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 
-{% block head %}
-
-{% endblock %}
-
-{% block body %}
+{% block content %}
 <!doctype html>
      <title>ISU Calendar Manager</title>
      <center><h1>Upload your ISU Redbird Calendar!</h1>
@@ -12,8 +8,4 @@
          <input type=file name="file">
          <input type=submit value=Upload>
      </form></center>
-     <center><h1>Download your ISU Redbird Calendar!</h1>
-     <form method=post action="/display">
-        <button><a>Preview thing</a></button>
-    </form></center>
 {% endblock %}

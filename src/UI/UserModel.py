@@ -29,7 +29,7 @@ class UserModel:
         dbs = DatabaseService(self.calendar, connection)
         if (dbs.getCalendar == null):
             cName = calName
-            calModel = EventModel(self.calendar, cName)
+            calModel = CalendarModel(self.calendar, cName)
             calModel.generateICSFile()
         else:
             cal = dbs.getCalendar(self.calendar)

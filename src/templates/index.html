@@ -1,18 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Classes {% endblock %}</h1>
+    <h1>{% block title %} Events {% endblock %}</h1>
     {% for message in messages %}
         <div class='message'>
             <h3>{{ message['Summary'] }}</h3>
-            <p>{{ message['DTSTART'] }}</p>
+            <p>{{ message['StartDate'] }}</p>
             <p>{{ message['StartTime'] }}</p>
-            <p>{{ message['DTEND'] }}</p>
             <p>{{ message['Duration'] }}</p>
             <p>{{ message['UNTIL'] }}</p>
             <p>{{ message['BYDAY'] }}</p>
             <p>{{ message['Description'] }}</p>
             <p>{{ message['Location'] }}</p>
+
+            <a class='button' href="{{ url_for('edit') }}"
+            {{ messages.index(message)}}>Edit an Event</a> 
+            
+            <a class='button' href="{{ url_for('remove') }}" >Remove an Event</a>
+            
         </div>
+        
     {% endfor %}
 {% endblock %}

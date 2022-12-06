@@ -1,8 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Add a New Event {% endblock %}</h1>
+    <h1>{% block title %} Edit the Event {% endblock %}</h1>
     <form method="post">
+
+        <label for="EventNum">Choose an event to edit based on Event Name: </label>
+        <br>
+        <select name="EventNum" required="true"> 
+            {% for message in messages %}
+            <option value="{{messages.index(message)}}"> {{ message['Summary'] }} </option>
+            {% endfor %}
+        </select>
+        <br>
+        <br>
+        
+
         <!-- This entry is for SUMMARY variable -->
         <label for="Summary">Event Name (Summary):</label>
         <br>
@@ -23,12 +35,12 @@
         <!-- The input above takes a specific format in date,
         if that is too annoying to change, uncomment the below. 
         The format it takes is year-month-day -->
+        
             <textarea name="StartDate"
                   placeholder="MM/DD/YYYY"
                   rows="1"
                   cols="20"
                   >{{ request.form['StartDate'] }}</textarea> 
-        </input>
         
         <br>
         <br>
@@ -39,11 +51,13 @@
         <p> ex. 03:15PM, must include AM or PM</p>
         <!-- <input type="time" name="StartTime"> -->
         <!-- Same as the above variable returns value in military time -->
+
         <textarea name="StartTime"
                   placeholder="##:##PM or ##:##AM"
                   rows="1"
                   cols="20"
                   >{{ request.form['StartTime'] }}</textarea> 
+
         <br>
         <br>
 
@@ -54,7 +68,7 @@
         <p> Duration of event in hours and minutes:</p>
         <p> ex. 1H15M</p>
         <!-- ex. 75-->
-        <!-- <input type="number" name="Duration" maxlength="4"> -->
+        <!-- <input type="number" name="Duration">-->
         <textarea name="Duration"
                   placeholder="1H15M"
                   rows="1"
@@ -63,8 +77,6 @@
         <br>
         <br>
 
-        <!-- Not sure what teh DTSTAMP value is or if it's needed-->
-        <!-- DTStamp will be down on backend, will be time the event is created-->
 
         <!-- RRULE can just stay a fixed value if needed, like weekly will stay the same most likely keep this UNTIL all caps to see if it affects anything-->
         <label for="UNTIL">End Date (UNTIL):</label>
@@ -72,11 +84,13 @@
         <p> Last day of event </p>
         <p> ex. 12/16/2022</p>
         <!-- <input type="date" name="UNTIL"> -->
+        
         <textarea name="UNTIL"
                   placeholder="MM/DD/YYYY"
                   rows="1"
                   cols="20"
                   >{{ request.form['UNTIL'] }}</textarea> 
+        
         <br>
         <br>
 

@@ -2,18 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %} - FlaskApp</title>
+    <title>ISU Calendar Generator{% block title %} {% endblock %}</title>
+    <center>
     <style>
         .message {
             padding: 10px;
             margin: 5px;
-            background-color: #f3f3f3
         }
         nav a {
-            color: #d64161;
+            color: #CE1126;
             font-size: 3em;
             margin-left: 50px;
             text-decoration: none;
+            /* background-color: #000000; */
+            border-radius: 25px;
+            padding: 5px;
         }
 
         .alert {
@@ -23,13 +26,32 @@
             background-color: #ffd5de;
         }
 
-    </style>
-</head>
+        .button {
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        background-color: #FF0000;
+        }
+
+    </style></center>
+<center></head>
 <body>
     <nav>
-        <a href="{{ url_for('index') }}">FlaskApp</a>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('index') }}">Calendar Preview</a>
         <a href="{{ url_for('create') }}">Create</a>
+        <a href="{{ url_for('upload') }}">Upload</a>
+        {% if current_user.is_authenticated %}
+            <a href="/logout">Logout</a>
+        {% endif %}
         <!-- <a href="#">About</a> -->
+        
     </nav>
     <hr>
     <div class="content">
@@ -38,5 +60,9 @@
         {% endfor %}
         {% block content %} {% endblock %}
     </div>
-</body>
+    <div>
+        <br>
+        <a class='button' href="path_to_file" download="proposed_file_name">Download</a>
+    </div>
+</body></center>
 </html>
