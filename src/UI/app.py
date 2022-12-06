@@ -1,9 +1,15 @@
 # Author: Xavier Arriaga, Gordon (Tre) Blankenship
+from EventModel import *
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
 from accountHandler import AccountHandler as User
 import os
+import sys
 from os.path import join, dirname, realpath
+from flask_sqlalchemy import SQLAlchemy
+from icalendar import Calendar, Event
+sys.path.append("..")
+# from static import uploads
 
 ##from iCalendar import Calendar, Event
 #from wtforms import Form, BooleanField, StringField, PasswordField, validators
@@ -22,7 +28,10 @@ login_manager.init_app(app)
 # but I couldn't get it to work for the time being, so keep it for now
 # unless you know how to fix it
 messages = [
+    {'Summary': 'asdf', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {
+        'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
 ]
+
 
 # debug mode toggle comment
 app.config["DEBUG"] = True
@@ -98,25 +107,26 @@ def uploadFiles():
 @app.route('/create/')
 def index():
     return render_template('index.html', messages=messages)
-    # these files are key to this working
+    # these template files are key to this working
 
 # Create handles the GET-ing of information from the form
 @app.route('/class_preview/class/', methods=('GET', 'POST'))
 def create():
+    #event = Event()
+
     if request.method == 'POST':
         summary = request.form['Summary']
-        DTStart = request.form['DTSTART']  # start date
+        StartDate = request.form['StartDate']  # start date
         StartTime = request.form['StartTime']  # start time
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
         BYDAY = request.form['BYDAY']
         Description = request.form['Description']
         Location = request.form['Location']
-        # DTStamp will be down on backend, will be time the event is created
 
         if not summary:
             flash('Class Name is required!')
-        elif not DTStart:
+        elif not StartDate:
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
@@ -126,12 +136,117 @@ def create():
             flash('UNTIL is required')
         elif not BYDAY:
             flash('BYDAY is required')
+        elif not Description:
+            flash('Description is required')
+        elif not Location:
+            flash('Location is required')
         else:
-            messages.append({'Summary': summary, 'DTSTART': DTStart, 'Duration': Duration,
+            messages.append({'Summary': summary, 'StartDate': StartDate, 'StartTime': StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
+
+            # change 0 index?
+            event = EventModel.addEvents(list(messages))
+            # cal.add_component(add_event)
+            new_line = '\n'
+            v_cal = 'END:VCALENDAR'
+
+            with open('static/uploads/test_calendar.ics') as f:
+                for line in f:
+                    pass
+                last_line = line
+
+            if last_line == v_cal:
+                with open('static/uploads/test_calendar.ics', "r+", encoding="utf-8") as file:
+
+                    file.seek(0, os.SEEK_END)
+
+                    pos = file.tell() - 1
+
+                    while pos > 0 and file.read(1) != "\n":
+                        pos -= 1
+                        file.seek(pos, os.SEEK_SET)
+
+                    if pos > 0:
+                        file.seek(pos, os.SEEK_SET)
+                        file.truncate()
+
+            with open('static/uploads/test_calendar.ics') as f:
+                for line in f:
+                    pass
+                last_line = line
+
+            with open('static/uploads/test_calendar.ics', 'ab') as file:
+                file.write(new_line.encode('utf-8'))
+                file.write(event.to_ical())
+                if last_line != v_cal:
+                    file.write(v_cal.encode('utf-8'))
+
             return redirect(url_for('index'))
 
     return render_template('create.html')
+
+
+@app.route('/class-preview/edit-class/', methods=('GET', 'POST'))
+def edit():
+    if request.method == 'POST':
+        eventNum = request.form['EventNum']
+        summary = request.form['Summary']
+        StartTime = request.form['StartTime']  # start date
+        StartTime = request.form['StartTime']  # start time
+        Duration = request.form['Duration']
+        UNTIL = request.form['UNTIL']
+        BYDAY = request.form['BYDAY']
+        Description = request.form['Description']
+        Location = request.form['Location']
+
+        if not summary:
+            flash('Class Name is required!')
+        elif not StartTime:
+            flash('Start Date is required!')
+        elif not StartTime:
+            flash('Start Time is required')
+        elif not Duration:
+            flash('Duration is required')
+        elif not UNTIL:
+            flash('UNTIL is required')
+        elif not BYDAY:
+            flash('BYDAY is required')
+        elif (int(eventNum) > len(messages)) or (int(eventNum) < 0):
+            flash('The Event number does not exist')
+        else:
+            messages[int(eventNum)] = ({'Summary': summary, 'DTSTART': StartTime, 'StartTime': StartTime, 'Duration': Duration,
+                                        'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
+            return redirect(url_for('index'))
+
+    return render_template('edit.html')
+
+
+@app.route('/class-preview/remove-class/', methods=('GET', 'POST'))
+def remove():
+    if request.method == 'POST':
+        # how do we get specific calendar/filename?
+        filename = 'static/uploads/test_calendar.ics'
+        eventNum = int(request.form['EventNum'])
+        if (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
+            flash('The Event number does not exist')
+            # doesnt let me remove 0
+        else:
+            EventModel.removeEvents(
+                filename, list(messages[eventNum].values()))
+            messages.pop(eventNum)
+            return redirect(url_for('index'))
+
+    # eventNum = int(request.form['EventNum'])
+    # if (int(eventNum) > len(messages)) or (int(eventNum) < 0):
+    #     flash('The Event number does not exist')
+    # else:
+    #     print("removing dumbass dumbass dumbass")
+    #     print(messages[0])
+    #     messages.pop(eventNum)
+    #     return redirect(url_for('index'))
+
+    return render_template('remove.html')
+
 
 # Location should be kept not required alongside some others likely (description?)
 if (__name__ == '__main__'):

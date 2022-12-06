@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Add a New Event {% endblock %}</h1>
+    <h1>{% block title %} Edit the Event {% endblock %}</h1>
     <form method="post">
+
+        <label for="EventNum"> Event Number in Calendar: </label>
+        <input type="number" name="EventNum"> 
+        <!-- <input type="hidden" name="EventNum"> --> 
+        <br>
+        <br>
+        
+
         <!-- This entry is for SUMMARY variable -->
         <label for="Summary">Event Name (Summary):</label>
         <br>
@@ -19,17 +27,17 @@
         <br>
         <p> month/day/year</p>
         <p> ex. 01/17/2022</p>
-        <!-- <input type="date" name="StartDate">  -->
+        <input type="date" name="StartDate"> 
         <!-- The input above takes a specific format in date,
         if that is too annoying to change, uncomment the below. 
         The format it takes is year-month-day -->
-        
-        <textarea name="StartDate"
-                placeholder="MM/DD/YYYY"
-                rows="1"
-                cols="20"
-                >{{ request.form['StartDate'] }}</textarea>
-       
+        <!-- 
+            <textarea name="DTSTART"
+                  placeholder="MM/DD/YYYY"
+                  rows="1"
+                  cols="20"
+                  >{{ request.form['DTSTART'] }}</textarea> 
+        -->
         <br>
         <br>
 
@@ -37,15 +45,15 @@
         <br>
         <p> Non-military time that the event starts at</p>
         <p> ex. 03:15PM, must include AM or PM</p>
-        <!-- <input type="time" name="StartTime"> -->
+        <input type="time" name="StartTime">
         <!-- Same as the above variable returns value in military time -->
-        
+        <!--
         <textarea name="StartTime"
                   placeholder="##:##PM or ##:##AM"
                   rows="1"
                   cols="20"
                   >{{ request.form['StartTime'] }}</textarea> 
-       
+        -->
         <br>
         <br>
 
@@ -56,7 +64,7 @@
         <p> Duration of event in hours and minutes:</p>
         <p> ex. 1H15M</p>
         <!-- ex. 75-->
-        <!-- <input type="number" name="Duration" maxlength="4"> -->
+        <!-- <input type="number" name="Duration">-->
         <textarea name="Duration"
                   placeholder="1H15M"
                   rows="1"
@@ -73,14 +81,14 @@
         <br>
         <p> Last day of event </p>
         <p> ex. 12/16/2022</p>
-        <!-- <input type="date" name="UNTIL">  -->
-        
+        <input type="date" name="UNTIL"> 
+        <!--
         <textarea name="UNTIL"
                   placeholder="MM/DD/YYYY"
                   rows="1"
                   cols="20"
                   >{{ request.form['UNTIL'] }}</textarea> 
-       
+        -->
         <br>
         <br>
 
