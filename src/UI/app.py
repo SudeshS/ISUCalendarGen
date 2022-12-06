@@ -1,5 +1,5 @@
 # Author: Xavier Arriaga, Gordon (Tre) Blankenship
-from EventModel import *
+from CalendarModel import *
 from flask import Flask, render_template, request, url_for, flash, redirect
 from flask_login import LoginManager
 from accountHandler import AccountHandler as User
@@ -110,13 +110,15 @@ def index():
     # these template files are key to this working
 
 # Create handles the GET-ing of information from the form
-@app.route('/class_preview/class/', methods=('GET', 'POST'))
+
+
+@app.route('/calendar-preview/event/', methods=('GET', 'POST'))
 def create():
     #event = Event()
 
     if request.method == 'POST':
         summary = request.form['Summary']
-        StartDate = request.form['StartDate']  # start date
+        startDate = request.form['StartDate']  # start date
         StartTime = request.form['StartTime']  # start time
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
@@ -126,7 +128,7 @@ def create():
 
         if not summary:
             flash('Class Name is required!')
-        elif not StartDate:
+        elif not startDate:
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
@@ -141,11 +143,11 @@ def create():
         elif not Location:
             flash('Location is required')
         else:
-            messages.append({'Summary': summary, 'StartDate': StartDate, 'StartTime': StartTime, 'Duration': Duration,
+            messages.append({'Summary': summary, 'StartDate': startDate, 'StartTime':StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
 
             # change 0 index?
-            event = EventModel.addEvents(list(messages))
+            event = CalendarModel.addEvents(list(messages))
             # cal.add_component(add_event)
             new_line = '\n'
             v_cal = 'END:VCALENDAR'
@@ -185,13 +187,12 @@ def create():
 
     return render_template('create.html')
 
-
-@app.route('/class-preview/edit-class/', methods=('GET', 'POST'))
+@app.route('/calendar-preview/edit-event/', methods=('GET', 'POST'))
 def edit():
     if request.method == 'POST':
         eventNum = request.form['EventNum']
         summary = request.form['Summary']
-        StartTime = request.form['StartTime']  # start date
+        startDate = request.form['StartDate']  # start date
         StartTime = request.form['StartTime']  # start time
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
@@ -201,7 +202,7 @@ def edit():
 
         if not summary:
             flash('Class Name is required!')
-        elif not StartTime:
+        elif not startDate:
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
@@ -211,41 +212,31 @@ def edit():
             flash('UNTIL is required')
         elif not BYDAY:
             flash('BYDAY is required')
-        elif (int(eventNum) > len(messages)) or (int(eventNum) < 0):
-            flash('The Event number does not exist')
+        elif (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
+            flash('This Event ID does not exist')
         else:
-            messages[int(eventNum)] = ({'Summary': summary, 'DTSTART': StartTime, 'StartTime': StartTime, 'Duration': Duration,
-                                        'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
+            messages[int(eventNum)] = ({'Summary': summary, 'StartDate': startDate, 'StartTime': StartTime, 'Duration': Duration,
+                            'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             return redirect(url_for('index'))
 
-    return render_template('edit.html')
+    return render_template('edit.html', messages=messages)
 
 
-@app.route('/class-preview/remove-class/', methods=('GET', 'POST'))
+@app.route('/calendar-preview/remove-event/', methods=('GET', 'POST'))
 def remove():
     if request.method == 'POST':
         # how do we get specific calendar/filename?
         filename = 'static/uploads/test_calendar.ics'
         eventNum = int(request.form['EventNum'])
-        if (int(eventNum) > len(messages)) or (int(eventNum) <= 0):
-            flash('The Event number does not exist')
-            # doesnt let me remove 0
+        if (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
+            flash('This Event ID does not exist')
         else:
-            EventModel.removeEvents(
+            CalendarModel.removeEvents(
                 filename, list(messages[eventNum].values()))
             messages.pop(eventNum)
             return redirect(url_for('index'))
 
-    # eventNum = int(request.form['EventNum'])
-    # if (int(eventNum) > len(messages)) or (int(eventNum) < 0):
-    #     flash('The Event number does not exist')
-    # else:
-    #     print("removing dumbass dumbass dumbass")
-    #     print(messages[0])
-    #     messages.pop(eventNum)
-    #     return redirect(url_for('index'))
-
-    return render_template('remove.html')
+    return render_template('remove.html', messages=messages)
 
 
 # Location should be kept not required alongside some others likely (description?)

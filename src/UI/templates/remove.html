@@ -1,14 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Remove the Event {% endblock %}</h1>
+    <h1>{% block title %} Remove Event {% endblock %}</h1>
     <form method="post">
 
-        <label for="EventNum"> Event Number in Calendar: </label>
-        <input type="number" name="EventNum"> 
-        <!-- <input type="hidden" name="EventNum"> --> 
+        <label for="EventNum">Choose an event to remove based on Event Name: </label>
         <br>
-        <br>
+        <select name="EventNum" required="true">
+            <p>Event Name: </p>
+            {% for message in messages %}
+            <option value="{{messages.index(message)}}"> {{ message['Summary'] }} </option>
+            {% endfor %}
+
+        
+        </select>
         <button type="submit">Submit</button>
+        
+
     </form>
 {% endblock %}
