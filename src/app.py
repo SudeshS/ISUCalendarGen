@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 from CalendarModel import *
-from accountHandler import AccountHandler as User
+from AccountHandler import AccountHandler as User
 
 
 app = Flask(__name__)
