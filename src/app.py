@@ -161,6 +161,11 @@ def index():
     # these files are key to this working
 
 
+@app.route('/preview/')
+def preview():
+    return render_template('preview.html', messages=messages, current_user=current_user)
+
+
 @app.route("/create/<int:calendarid>", methods=('GET', 'POST'))
 def create(calendarid):
     modifyCal = db.session.query(CalendarTable).filter(CalendarTable.id==calendarid).one()
@@ -283,7 +288,7 @@ def remove(calendarid):
             CalendarModel.removeEvents(
                 filename, list(messages[eventNum].values()))
             messages.pop(eventNum)
-            return render_template('index.html', messages=messages, current_user=current_user)
+            return render_template('index.html', messages=messages, current_user=current_user, calendarid=calendarid)
 
     return render_template('remove.html', messages=messages, current_user=current_user, calendarid=calendarid)
 
