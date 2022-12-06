@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} Events {% endblock %}</h1>
+    {% for message in messages %}
+        <div class='message'>
+            <h3>{{ message['Summary'] }}</h3>
+            <p>{{ message['StartDate'] }}</p>
+            <p>{{ message['StartTime'] }}</p>
+            <p>{{ message['Duration'] }}</p>
+            <p>{{ message['UNTIL'] }}</p>
+            <p>{{ message['BYDAY'] }}</p>
+            <p>{{ message['Description'] }}</p>
+            <p>{{ message['Location'] }}</p>
+        </div>
+        
+    {% endfor %}
+{% endblock %}
