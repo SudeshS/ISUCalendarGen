@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
-from accountHandler import AccountHandler as User
+import accountHandler as User
 
 
 app = Flask(__name__)
@@ -21,36 +21,36 @@ messages = []
 
 # Upload folder
 UPLOAD_FOLDER = app.static_folder
-app.config['UPLOAD_FOLDER'] = f"{UPLOAD_FOLDER}/uploads" # For macos/linux
-#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
+# app.config['UPLOAD_FOLDER'] = f"{UPLOAD_FOLDER}/uploads" # For macos/linux
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER+'\\uploads\\'
 
 # Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.Text, unique=True)
-    password = db.Column(db.Text)
-    calendars = db.relationship('Calendar', backref='user')
+# class User(UserMixin, db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.Text, unique=True)
+#     password = db.Column(db.Text)
+#     calendars = db.relationship('Calendar', backref='user')
     
-    def __init__(self, username, password):
-        self.username = username
-        self.set_password(password)
+#     def __init__(self, username, password):
+#         self.username = username
+#         self.set_password(password)
 
-    def set_password(self, password):
-        self.password = generate_password_hash(password, method='sha256')
+#     def set_password(self, password):
+#         self.password = generate_password_hash(password, method='sha256')
 
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
+#     def check_password(self, password):
+#         return check_password_hash(self.password, password)
 
 
 class Calendar(db.Model):
   cal_id = db.Column(db.Integer, primary_key=True)
   filename = db.Column(db.Text)
   file_data = db.Column(db.Text)
-  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+  user_id = db.Column(db.Integer, db.ForeignKey('AccountHandler.id'))
 
   def __init__(self, filename, file_data, user_id):
     self.filename = filename
@@ -80,17 +80,19 @@ def unauthorized():
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    
+    # session handling
     if current_user.is_authenticated:
         return redirect(url_for('home'))
 
     error = None
+
     if request.method == 'POST':
         uname = request.form['username']
         pword = request.form['password']
-        user = User.query.filter_by(username=uname).first()
+        user1 = User(uname, pword)
 
-        if user and user.check_password(pword):
-            login_user(user)
+        if user1.login():
             return render_template('home.html', current_user=current_user)
         else:
             error = 'Invalid Credentials. Please try again or create a new account'
