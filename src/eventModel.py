@@ -63,4 +63,3 @@ class EventModel:
     #                     break
 
     #     return event_list
- 

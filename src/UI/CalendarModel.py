@@ -7,7 +7,7 @@ It also deals with generating the ICSFile and generating a preview
 
 
 from CalendarPreview import CalendarPreview
-from eventModel import EventModel
+from EventModel import EventModel
 from calendar import month
 from icalendar import Calendar, Event
 from datetime import datetime, time

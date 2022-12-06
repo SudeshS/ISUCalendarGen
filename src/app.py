@@ -4,7 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
-from accountHandler import AccountHandler as User
+from CalendarModel import *
+#from accountHandler import AccountHandler as User
 
 
 app = Flask(__name__)
@@ -133,13 +134,13 @@ def create_account():
 
 @app.route('/home/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', current_user=current_user)
 
 
 @app.route('/upload/')
 def upload():
     # Set the upload HTML template '\templates\index.html'
-    return render_template('upload.html')
+    return render_template('upload.html', current_user=current_user)
 
 
 @app.route('/upload/', methods=['POST'])
@@ -162,32 +163,33 @@ def uploadFiles():
         uploaded_file.save(file_path)
         # save the file
 
-    return redirect(url_for('upload'))
+    return render_template('upload.html', current_user=current_user)
 
 
 # Create page rendering
 @app.route('/create/')
 def index():
-    return render_template('index.html', messages=messages)
+    return render_template('index.html', messages=messages, current_user=current_user)
     # these files are key to this working
 
 
-@app.route('/class_preview/class/', methods=('GET', 'POST'))
+@app.route('/calendar-preview/event/', methods=('GET', 'POST'))
 def create():
+    #event = Event()
+
     if request.method == 'POST':
         summary = request.form['Summary']
-        DTStart = request.form['DTSTART']  # start date
+        startDate = request.form['StartDate']  # start date
         StartTime = request.form['StartTime']  # start time
         Duration = request.form['Duration']
         UNTIL = request.form['UNTIL']
         BYDAY = request.form['BYDAY']
         Description = request.form['Description']
         Location = request.form['Location']
-        # DTStamp will be down on backend, will be time the event is created
 
         if not summary:
             flash('Class Name is required!')
-        elif not DTStart:
+        elif not startDate:
             flash('Start Date is required!')
         elif not StartTime:
             flash('Start Time is required')
@@ -197,12 +199,71 @@ def create():
             flash('UNTIL is required')
         elif not BYDAY:
             flash('BYDAY is required')
+        elif not Description:
+            flash('Description is required')
+        elif not Location:
+            flash('Location is required')
         else:
-            messages.append({'Summary': summary, 'DTSTART': DTStart, 'Duration': Duration,
+            messages.append({'Summary': summary, 'StartDate': startDate, 'StartTime':StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
-            return redirect(url_for('index'))
+
+            # change 0 index?
+            #event = CalendarModel.addEvents(list(messages))
+            return render_template('index.html', messages=messages, current_user=current_user)
 
     return render_template('create.html')
+
+
+@app.route('/calendar-preview/edit-event/', methods=('GET', 'POST'))
+def edit():
+    if request.method == 'POST':
+        eventNum = request.form['EventNum']
+        summary = request.form['Summary']
+        startDate = request.form['StartDate']  # start date
+        StartTime = request.form['StartTime']  # start time
+        Duration = request.form['Duration']
+        UNTIL = request.form['UNTIL']
+        BYDAY = request.form['BYDAY']
+        Description = request.form['Description']
+        Location = request.form['Location']
+
+        if not summary:
+            flash('Class Name is required!')
+        elif not startDate:
+            flash('Start Date is required!')
+        elif not StartTime:
+            flash('Start Time is required')
+        elif not Duration:
+            flash('Duration is required')
+        elif not UNTIL:
+            flash('UNTIL is required')
+        elif not BYDAY:
+            flash('BYDAY is required')
+        elif (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
+            flash('This Event ID does not exist')
+        else:
+            messages[int(eventNum)] = ({'Summary': summary, 'StartDate': startDate, 'StartTime': StartTime, 'Duration': Duration,
+                            'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
+            return render_template('index.html', messages=messages, current_user=current_user)
+
+    return render_template('edit.html', messages=messages, current_user=current_user)
+
+
+@app.route('/calendar-preview/remove-event/', methods=('GET', 'POST'))
+def remove():
+    if request.method == 'POST':
+        # how do we get specific calendar/filename?
+        filename = 'static/uploads/test_calendar.ics'
+        eventNum = int(request.form['EventNum'])
+        if (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
+            flash('This Event ID does not exist')
+        else:
+            CalendarModel.removeEvents(
+                filename, list(messages[eventNum].values()))
+            messages.pop(eventNum)
+            return render_template('index.html', messages=messages, current_user=current_user)
+
+    return render_template('remove.html', messages=messages, current_user=current_user)
 
 
 if (__name__ == '__main__'):

@@ -4,7 +4,6 @@
     <h1>{% block title %} Events {% endblock %}</h1>
     {% for message in messages %}
         <div class='message'>
-            <p> ID: {{ messages.index(message)}}</p>
             <h3>{{ message['Summary'] }}</h3>
             <p>{{ message['StartDate'] }}</p>
             <p>{{ message['StartTime'] }}</p>
