@@ -7,7 +7,8 @@ The UserModel class is also responsible for checking if a User has an account.
 """
 from DatabaseService import DatabaseService
 from CalendarModel import CalendarModel
-import accountHandler
+import EventModel
+import AccountHandler
 
 class UserModel:
     def __init__(self, userID, calendar): #Declaring the class

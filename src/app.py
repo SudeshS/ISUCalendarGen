@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from CalendarModel import *
 import psycopg2
-#from accountHandler import AccountHandler as User
+from AccountHandler import AccountHandler as User
 
 
 

@@ -1,19 +1,19 @@
 # testing file for all class and files used.
 import pytest
-import accountHandler, AccountModel
+import AccountHandler, AccountModel
 import CalendarModel, CalendarPreview
 import DatabaseConnection, DatabaseService
-import eventModel, ics_generator
+import EventModel, ics_generator
 import server, UserModel
 
 # accountHandler tests
 def accountHandlerTest():
     
-    user = accountHandler.AccountHandler('admin', 'password')
+    user = AccountHandler.AccountHandler('admin', 'password')
 
     # login check
-    assert accountHandler.login('admin', 'password') == True
-    assert accountHandler.login('fake', 'account') == False
+    assert AccountHandler.login('admin', 'password') == True
+    assert AccountHandler.login('fake', 'account') == False
     
     # getUsername/Password checks
     assert user.getUsername() == 'admin'
