@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block body %}
+        <form action="{{ url_for('CalendarUpdate')}}" method="post"> 
+		<h5>Update Calendar Events</h5>
+		{% for cr in calendar %}
+		<div class="form-group">
+            <input class="form-control" type="hidden" name="id" placeholder="Calendar ID" value={{bk[0]}} >
+        </div>
+		<div class="form-group">
+            <input class="form-control" type="text" name="filename" placeholder="File Name" value={{bk[1]}}>
+        </div>
+		<div class="form-group">
+            <input class="form-control" type="text" name="file_data" placeholder="File Data" value={{bk[2]}}>
+        </div>
+		<div class="form-group">
+            <input class="form-control" type="text" name="user_id" placeholder="User ID" value={{bk[3]}}>
+        </div>
+		<div class="form-group">
+			<button class="btn btn-primary">Submit</button>
+		</div>
+		{% endfor %}
+		</form>
+	{% endblock %}

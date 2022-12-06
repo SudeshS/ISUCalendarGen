@@ -16,6 +16,7 @@
                   {% for datum in data %}
                       <th scope="row">{{datum.filename}}</th>
                       <td><b><a href="{{url_for('calendarSave', calendarid=datum.id)}}">Save Calendar</a></b></td>
+                      <td><b><a href="{{url_for('calendarModify', calendarid=datum.id)}}">Edit Calendar</a></b></td>
                       <td><b><a href="{{url_for('calendarDelete', calendarid=datum.id)}}">Delete Calendar</a></b></td>
                   {% endfor %}
               </table>
