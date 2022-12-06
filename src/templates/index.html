@@ -13,10 +13,10 @@
             <p>{{ message['Description'] }}</p>
             <p>{{ message['Location'] }}</p>
 
-            <a class='button' href="{{ url_for('edit') }}"
+            <a class='button' href="{{ url_for('edit', calendarid = calendarid) }}"
             {{ messages.index(message)}}>Edit an Event</a> 
             
-            <a class='button' href="{{ url_for('remove') }}" >Remove an Event</a>
+            <a class='button' href="{{ url_for('remove', calendarid = calendarid) }}" >Remove an Event</a>
             
         </div>
         

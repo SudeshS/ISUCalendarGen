@@ -112,7 +112,7 @@ def uploadFiles():
             filename=uploadfile.filename
             readfile = uploadfile.read()
             file_data = '{}'.format(readfile)
-            cform = Calendar(filename, file_data, current_user.id)
+            cform = CalendarTable(filename, file_data, current_user.id)
             db.session.add(cform)
             db.session.commit()
 
@@ -137,7 +137,7 @@ def calendarSave(calendarid):
     rel_path = "exportedcalendar.ics"
     abs_file_path = os.path.join(filepath, rel_path)
     f = open(abs_file_path, 'w')
-    saveCal = db.session.query(Calendar).filter(Calendar.id==calendarid)
+    saveCal = db.session.query(CalendarTable).filter(CalendarTable.id==calendarid)
     for saveFile in saveCal:
         saveFile.file_data = saveFile.file_data.strip('\'')
         saveFile.file_data = saveFile.file_data.replace('\\r\\n', '\n')
@@ -154,16 +154,32 @@ def calendarDelete(calendarid):
     db.session.commit()
     return render_template("home.html")
 
+#access calendar modification
+#@app.route("/calendarModify/<int:calendarid>")
+#def calendarModify(calendarid):
+   # strModify="SELECT * FROM calendar where id="+str(calendarid)
+    #calendar=db.session.execute(strModify)
+   # return render_template("modifyCalendar.html",calendarinfo=calendar)
+
+
 # Create page rendering
-@app.route('/create/')
+@app.route('/index/')
 def index():
     return render_template('index.html', messages=messages, current_user=current_user)
     # these files are key to this working
 
 
-@app.route('/calendar-preview/event/', methods=('GET', 'POST'))
-def create():
-    #event = Event()
+@app.route("/create/<int:calendarid>", methods=('GET', 'POST'))
+def create(calendarid):
+    modifyCal = db.session.query(CalendarTable).filter(CalendarTable.id==calendarid).one()
+    file_data = modifyCal.file_data
+    local_file = open("localfile.ics", "w")
+    file_data = file_data.strip('\'')
+    file_data = file_data.replace('\\r\\n', '\n')
+    file_data = file_data.replace('b\'', '')
+    local_file.write(file_data)
+    local_file.close()
+    filename = 'localfile.ics'
 
     if request.method == 'POST':
         summary = request.form['Summary']
@@ -195,15 +211,30 @@ def create():
             messages.append({'Summary': summary, 'StartDate': startDate, 'StartTime':StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
 
-            # change 0 index?
-            #event = CalendarModel.addEvents(list(messages))
-            return render_template('index.html', messages=messages, current_user=current_user)
+            event = CalendarModel.addEvents(messages[-1], filename)
+            
+            with open(filename, "r+", encoding="utf-8") as file:
+                file_content = file.read()
+                modifyCal.file_data = file_content
+                db.session.commit()
+
+            return render_template('index.html', messages=messages, current_user=current_user, calendarid=calendarid)
+        
 
     return render_template('create.html')
 
 
-@app.route('/calendar-preview/edit-event/', methods=('GET', 'POST'))
-def edit():
+@app.route('/calendar-preview/edit-event/<int:calendarid>', methods=('GET', 'POST'))
+def edit(calendarid):
+    modifyCal = db.session.query(CalendarTable).filter(CalendarTable.id==calendarid).one()
+    file_data = modifyCal.file_data
+    local_file = open("localfile.ics", "w")
+    file_data = file_data.strip('\'')
+    file_data = file_data.replace('\\r\\n', '\n')
+    file_data = file_data.replace('b\'', '')
+    local_file.write(file_data)
+    local_file.close()
+    filename = 'localfile.ics'
     if request.method == 'POST':
         eventNum = request.form['EventNum']
         summary = request.form['Summary']
@@ -230,18 +261,29 @@ def edit():
         elif (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
             flash('This Event ID does not exist')
         else:
+            old_event = messages[int(eventNum)]
             messages[int(eventNum)] = ({'Summary': summary, 'StartDate': startDate, 'StartTime': StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
-            return render_template('index.html', messages=messages, current_user=current_user)
+            CalendarModel.updateEvent(
+                messages[int(eventNum)], list(old_event.values()), filename) 
+            return render_template('index.html', messages=messages, current_user=current_user, calendarid=calendarid)
 
     return render_template('edit.html', messages=messages, current_user=current_user)
 
 
-@app.route('/calendar-preview/remove-event/', methods=('GET', 'POST'))
-def remove():
+@app.route('/calendar-preview/remove-event/<int:calendarid>', methods=('GET', 'POST'))
+def remove(calendarid):
     if request.method == 'POST':
         # how do we get specific calendar/filename?
-        filename = 'static/uploads/test_calendar.ics'
+        modifyCal = db.session.query(CalendarTable).filter(CalendarTable.id==calendarid).one()
+        file_data = modifyCal.file_data
+        local_file = open("localfile.ics", "w")
+        file_data = file_data.strip('\'')
+        file_data = file_data.replace('\\r\\n', '\n')
+        file_data = file_data.replace('b\'', '')
+        local_file.write(file_data)
+        local_file.close()
+        filename = 'localfile.ics'
         eventNum = int(request.form['EventNum'])
         if (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
             flash('This Event ID does not exist')
@@ -251,7 +293,7 @@ def remove():
             messages.pop(eventNum)
             return render_template('index.html', messages=messages, current_user=current_user)
 
-    return render_template('remove.html', messages=messages, current_user=current_user)
+    return render_template('remove.html', messages=messages, current_user=current_user, calendarid=calendarid)
 
 
 if (__name__ == '__main__'):

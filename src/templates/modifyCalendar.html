@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+        <table class="table" >
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">File Name</th>
+                    <th scope="col">File Data</th>
+                    <th scope="col">User ID</th>
+                </tr>
+            </thead>
+            {% for cr in calendarinfo %}
+                <td scope="row">{{cr.id}}</td>
+                <td scope="row">{{cr.filename}}</td>
+                <td scope="row">{{cr.file_data}}</td>
+                <td scope="row">{{cr.user_id}}</td>
+            {% endfor %}
+        </table>
+{% endblock %}

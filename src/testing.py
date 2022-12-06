@@ -32,23 +32,34 @@ def test_guest_with_events():  # guest test parse calendar with four events
 
 
 def test_add_events():
+    filename = 'UI/static/uploads/test_calendar.ics'
     messages = [
         {'Summary': 'asdf', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {
             'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
     ]
 
-    event = CalendarModel.addEvents(list(messages))
+    # messages = messages[len(messages)-1]
+
+    CalendarModel.addEvents(messages[0], filename)
 
 
 def test_remove_events():
+    filename = 'UI/static/uploads/test_calendar.ics'
     messages = [
         {'Summary': 'COM 223', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {
             'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
     ]
+
+    CalendarModel.removeEvents(filename, list(messages[len(messages)-1].values()))
+
+def test_update_events():
     filename = 'UI/static/uploads/test_calendar.ics'
+    messages = [
+        {'Summary': 'COM 223', 'StartDate': '11/12/2022', 'StartTime': '11:00AM', 'Duration': '1H00M', 'UNTIL': '12/12/2022', 'BYDAY': 'FR', 'Description': 'ewofn132n', 'Location': '12r3'}, {
+            'Summary': 'asdfg', 'StartDate': '09/12/2022', 'StartTime': '12:00PM', 'Duration': '1H15M', 'UNTIL': '12/15/2022', 'BYDAY': 'MO', 'Description': '21on241', 'Location': '12241'}
+    ]
 
-    CalendarModel.removeEvents(filename, list(messages[0].values()))
-
+    CalendarModel.updateEvent(messages[1], list(messages[0].values()), filename)
 
 # test 3
 def test_guest_add_events():   # guest test add events
@@ -66,6 +77,7 @@ def test_guest_add_events():   # guest test add events
 if __name__ == "__main__":
     # test_parse_no_events()
     # test_guest_with_events()
-    test_add_events()
+    # test_add_events()
     # test_remove_events()
+    test_update_events()
     # add testing for accounts (sending to DB)
