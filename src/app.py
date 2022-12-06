@@ -169,41 +169,8 @@ def create():
             messages.append({'Summary': summary, 'StartDate': startDate, 'StartTime':StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
 
-            event = EventModel.addEvents(list(messages))
-            # cal.add_component(add_event)
-            new_line = '\n'
-            v_cal = 'END:VCALENDAR'
-
-            with open(filename) as f:
-                for line in f:
-                    pass
-                last_line = line
-
-            if last_line == v_cal:
-                with open(filename, "r+", encoding="utf-8") as file:
-
-                    file.seek(0, os.SEEK_END)
-
-                    pos = file.tell() - 1
-
-                    while pos > 0 and file.read(1) != "\n":
-                        pos -= 1
-                        file.seek(pos, os.SEEK_SET)
-
-                    if pos > 0:
-                        file.seek(pos, os.SEEK_SET)
-                        file.truncate()
-
-            with open(filename) as f:
-                for line in f:
-                    pass
-                last_line = line
-
-            with open(filename, 'ab') as file:
-                file.write(new_line.encode('utf-8'))
-                file.write(event.to_ical())
-                if last_line != v_cal:
-                    file.write(v_cal.encode('utf-8'))
+            event = CalendarModel.addEvents(messages[-1], filename)
+            
             return render_template('index.html', messages=messages, current_user=current_user)
 
     return render_template('create.html')
@@ -238,11 +205,11 @@ def edit():
         elif (int(eventNum) >= len(messages)) or (int(eventNum) < 0):
             flash('This Event ID does not exist')
         else:
-            old_event = messages = [int(eventNum)]
+            old_event = messages[int(eventNum)]
             messages[int(eventNum)] = ({'Summary': summary, 'StartDate': startDate, 'StartTime': StartTime, 'Duration': Duration,
                             'UNTIL': UNTIL, 'BYDAY': BYDAY, 'Description': Description, 'Location': Location})
             CalendarModel.updateEvent(
-                list(messages[int(eventNum)]), list(old_event.values()), filename) 
+                messages[int(eventNum)], list(old_event.values()), filename) 
             return render_template('index.html', messages=messages, current_user=current_user)
 
     return render_template('edit.html', messages=messages, current_user=current_user)

@@ -16,6 +16,8 @@ from sqlalchemy.orm import relationship
 from accountHandler import AccountHandler
 import os
 
+# END:VCALENDAR needs to be added at end of program
+# addEvents already adds this, implemenent a check before uploading/saving cal
 
 class CalendarTable(Base):
     __tablename__ = 'calendar'
@@ -104,9 +106,16 @@ class CalendarModel:
         event_list = []
         with open(filename, 'r') as file:
             summary, start, duration, rule, desc, location = "", "", "", "", "", ""
+            readline = False
             for line in file:
                 line = line.strip()
                 line = line.replace('\\n', '')
+
+
+                if line == 'BEGIN:VEVENT':
+                    readline = True
+                if not readline:
+                    continue
                 if line.startswith("SUMMARY"):
                     summary = line
                 elif line.startswith("DTSTART"):
@@ -122,7 +131,7 @@ class CalendarModel:
                 elif line.startswith("END:VEVENT"):
                     event_list.append(
                         EventModel(summary, location, start, duration, rule, desc))
-
+        
         return event_list
 
     # checks if the calendar is formated correctly
@@ -200,8 +209,14 @@ class CalendarModel:
         }
         event.add('rrule', rrule)
 
+        mins = start.minute + dur.minute
+        hours = start.hour + dur.hour
+        if mins > 60:
+            mins = mins - 60
+            hours += 1
+        
         end_datetime = datetime(year=start.year, month=start.month,
-                                day=start.day, hour=dur.hour, minute=dur.minute)
+                                day=start.day, hour=int(hours), minute=int(mins))
         event.add('dtend', end_datetime)
 
         desc = list(dict.values())[6]
@@ -264,6 +279,7 @@ class CalendarModel:
         return_flag = False
 
         event_list = CalendarModel.parse_cal(file)
+        # print(str(event_list))
         cal = CalendarModel.generateICSFile(event_list)
 
         # copies cal to new_cal without removed event
@@ -289,7 +305,7 @@ class CalendarModel:
             if add_flag == False:
                 new_cal.add_component(event)
 
-        with open('UI/static/uploads/test_calendar.ics', 'wb') as file:
+        with open('static/uploads/test_calendar.ics', 'wb') as file:
             file.write(new_cal.to_ical().strip())
 
         return return_flag
@@ -326,10 +342,20 @@ class CalendarModel:
             # dtend NEED THIS
             temp = event_list[i].start.split(":", 1)
             ftemp = event_list[i].duration.split(":")
+            print(ftemp)
             if len(ftemp) == 2:
-                hour_var = int(ftemp[1][1])   # event hour duration
-                hour_var = hour_var + int(temp[1][9:11])
-                dur_minute = int(ftemp[1][2:4])  # event minute duration
+                if len(ftemp[1]) == 5:
+                    hour_var = int(ftemp[1][1])   # event hour duration
+                    hour_var = hour_var + int(temp[1][9:11])
+                    dur_minute = int(ftemp[1][2:4])  # event minute duration
+                elif len(ftemp[1]) == 7:
+                    hour_var = int(ftemp[1][2]) 
+                    hour_var = hour_var + int(temp[1][9:11])
+                    dur_minute = int(ftemp[1][4:6])
+                else:
+                    hour_var = int(ftemp[1][1]) 
+                    hour_var = hour_var + int(temp[1][9:11])
+                    dur_minute = int(ftemp[1][2:4])
             else:
                 hour_var = int(ftemp[1][1])
                 hour_var = hour_var + int(temp[1][9:11])
