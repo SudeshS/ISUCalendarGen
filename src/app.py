@@ -30,8 +30,6 @@ app.config['UPLOAD_FOLDER'] = f"{UPLOAD_FOLDER}/uploads" # For macos/linux
 # Database config
 #app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:isu@localhost/CalendarDatabase'
-con = psycopg2.connect(database="CalendarDatabase", user="postgres", password="isu", host="localhost", port="5432")
-cursor=con.cursor()
 db = SQLAlchemy(app)
 
 # Login (on connection)
@@ -161,23 +159,31 @@ def calendarDelete(calendarid):
     return render_template("home.html")
 
 #access calendar modification
-@app.route("/calendarModify/<int:calendarid>")
-def calendarModify(calendarid):
-    strModify="SELECT * FROM calendar where id="+str(calendarid)
-    calendar=db.session.execute(strModify)
-    return render_template("modifyCalendar.html",calendarinfo=calendar)
+#@app.route("/calendarModify/<int:calendarid>")
+#def calendarModify(calendarid):
+   # strModify="SELECT * FROM calendar where id="+str(calendarid)
+    #calendar=db.session.execute(strModify)
+   # return render_template("modifyCalendar.html",calendarinfo=calendar)
 
 
 # Create page rendering
-@app.route('/create/')
+@app.route('/index/')
 def index():
     return render_template('index.html', messages=messages, current_user=current_user)
     # these files are key to this working
 
 
-@app.route('/calendar-preview/event/', methods=('GET', 'POST'))
-def create():
-    filename = 'static/uploads/test_calendar.ics'
+@app.route("/create/<int:calendarid>", methods=('GET', 'POST'))
+def create(calendarid):
+    modifyCal = db.session.query(CalendarTable).filter(CalendarTable.id==calendarid).one()
+    file_data = modifyCal.file_data
+    local_file = open("localfile.ics", "w")
+    file_data = file_data.strip('\'')
+    file_data = file_data.replace('\\r\\n', '\n')
+    file_data = file_data.replace('b\'', '')
+    local_file.write(file_data)
+    local_file.close()
+    filename = 'localfile.ics'
 
     if request.method == 'POST':
         summary = request.form['Summary']
@@ -211,14 +217,20 @@ def create():
 
             event = CalendarModel.addEvents(messages[-1], filename)
             
+            with open(filename, "r+", encoding="utf-8") as file:
+                file_content = file.read()
+                modifyCal.file_data = file_content
+                db.session.commit()
+
             return render_template('index.html', messages=messages, current_user=current_user)
+        
 
     return render_template('create.html')
 
 
 @app.route('/calendar-preview/edit-event/', methods=('GET', 'POST'))
 def edit():
-    filename = 'static/uploads/test_calendar.ics'   # change
+    filename = 'static\\uploads\\test_calendar.ics'   # change
     if request.method == 'POST':
         eventNum = request.form['EventNum']
         summary = request.form['Summary']
