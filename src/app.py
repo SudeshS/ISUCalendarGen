@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 from CalendarModel import *
-#from accountHandler import AccountHandler as User
+from accountHandler import AccountHandler as User
 
 
 app = Flask(__name__)
@@ -30,39 +30,39 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.Text, unique=True)
-    password = db.Column(db.Text)
-    calendars = db.relationship('Calendar', backref='user')
+# class User(UserMixin, db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.Text, unique=True)
+#     password = db.Column(db.Text)
+#     calendars = db.relationship('Calendar', backref='user')
     
-    def __init__(self, username, password):
-        self.username = username
-        self.set_password(password)
+#     def __init__(self, username, password):
+#         self.username = username
+#         self.set_password(password)
 
-    def set_password(self, password):
-        self.password = generate_password_hash(password, method='sha256')
+#     def set_password(self, password):
+#         self.password = generate_password_hash(password, method='sha256')
 
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
-
-
-class Calendar(db.Model):
-  cal_id = db.Column(db.Integer, primary_key=True)
-  filename = db.Column(db.Text)
-  file_data = db.Column(db.Text)
-  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-  def __init__(self, filename, file_data, user_id):
-    self.filename = filename
-    self.file_data = file_data
-    self.user_id = user_id
+#     def check_password(self, password):
+#         return check_password_hash(self.password, password)
 
 
-with app.app_context():
-    db.drop_all()
-    db.session.commit()
-    db.create_all()
+# class Calendar(db.Model):
+#   cal_id = db.Column(db.Integer, primary_key=True)
+#   filename = db.Column(db.Text)
+#   file_data = db.Column(db.Text)
+#   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+#   def __init__(self, filename, file_data, user_id):
+#     self.filename = filename
+#     self.file_data = file_data
+#     self.user_id = user_id
+
+
+# with app.app_context():
+#     db.drop_all()
+#     db.session.commit()
+#     db.create_all()
 
 
 # Login (on connection)

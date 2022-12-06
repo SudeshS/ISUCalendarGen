@@ -5,13 +5,32 @@ It is the main class for creating, updating, and removing events.
 It also deals with generating the ICSFile and generating a preview
 """
 
-
 from CalendarPreview import CalendarPreview
 from EventModel import EventModel
 from calendar import month
 from icalendar import Calendar, Event
 from datetime import datetime, time
+from baseTable import Base, engine
+from sqlalchemy import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship
+from accountHandler import AccountHandler
 
+
+class CalendarTable(Base):
+    __tablename__ = 'calendar'
+    __table_args__ = {'extend_existing':True}
+    id = Column(Integer, primary_key = True)
+    filename = Column(Text)
+    file_data = Column(Text)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    # user = relationship(AccountHandler)
+    
+    def __init__(self, filename, file_data, user_id):
+        self.filename = filename
+        self.file_data = file_data
+        self.user_id = user_id
+
+Base.metadata.create_all(engine)
 
 class CalendarModel:
     def __init__(self):
