@@ -9,6 +9,7 @@ import psycopg2
 #from accountHandler import AccountHandler as User
 
 
+
 app = Flask(__name__)
 
 # load environment variables from .env file
@@ -32,42 +33,6 @@ app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:isu@localhost/Calen
 con = psycopg2.connect(database="CalendarDatabase", user="postgres", password="isu", host="localhost", port="5432")
 cursor=con.cursor()
 db = SQLAlchemy(app)
-
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.Text, unique=True)
-    password = db.Column(db.Text)
-    calendars = db.relationship('Calendar', backref='user')
-    
-    def __init__(self, username, password):
-        self.username = username
-        self.set_password(password)
-
-    def set_password(self, password):
-        self.password = generate_password_hash(password, method='sha256')
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
-
-
-class Calendar(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  filename = db.Column(db.Text)
-  file_data = db.Column(db.Text)
-  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-  def __init__(self, filename, file_data, user_id):
-    self.filename = filename
-    self.file_data = file_data
-    self.user_id = user_id
-
-
-with app.app_context():
-    #db.drop_all()
-    db.session.commit()
-    db.create_all()
-
 
 # Login (on connection)
 @login_manager.user_loader
@@ -93,9 +58,9 @@ def login():
         uname = request.form['username']
         pword = request.form['password']
         user = User.query.filter_by(username=uname).first()
-
-        if user and user.check_password(pword):
-            login_user(user)
+        login_success = User.login(uname, pword)
+        if login_success:
+            #login_user(user)
             return render_template('home.html', current_user=current_user)
         else:
             error = 'Invalid Credentials. Please try again or create a new account'
@@ -108,7 +73,8 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()
+    #logout_user()
+    User.logout()
     return redirect(url_for('login'))
 
 
@@ -124,12 +90,8 @@ def create_account():
             flash(error)
         else:
             # **************SAVE TO DATABASE THE NEW USER HERE**********************
-            existing_user = User.query.filter_by(username=uname).first()
-            if existing_user is None:
-                user = User(uname, pword1)
-                db.session.add(user)
-                db.session.commit()
-                login_user(user)
+            account_created = User.createAccount(uname, pword1)
+            if account_created:
                 return render_template('home.html', current_user=current_user)
             flash('Error: A user already exists with that username.')
 
